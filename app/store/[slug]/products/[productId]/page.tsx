@@ -8,7 +8,11 @@ export async function generateMetadata({ params }: Props) {
   const { slug, productId } = await params;
   const product = await fetchPublicProduct(slug, productId);
   if (!product) return { title: "Product" };
-  const desc = (product.descriptionAi ?? product.descriptionRaw).slice(0, 160);
+  const text =
+    product.descriptionAi?.trim() ||
+    product.descriptionRaw?.trim() ||
+    "";
+  const desc = text.slice(0, 160);
   return { title: `${product.name} | HerBizReach`, description: desc };
 }
 
