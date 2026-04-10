@@ -90,3 +90,11 @@ body {
 .pb-safe {
   padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
 }
+
+/* Landing FAQ: rotate chevron when <details> is open (all browsers) */
+details.hbr-faq .hbr-faq-chevron {
+  transition: transform 0.2s ease;
+}
+details.hbr-faq[open] .hbr-faq-chevron {
+  transform: rotate(180deg);
+}
