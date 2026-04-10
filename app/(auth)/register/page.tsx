@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
+import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -32,8 +33,8 @@ export default function RegisterPage() {
   } = useForm<Form>({ resolver: zodResolver(schema) });
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[var(--bg-subtle)] px-4 py-10">
-      <Card className="w-full max-w-[440px] border-[var(--border-default)] shadow-[var(--shadow-lg)]">
+    <div className="w-full max-w-[440px]">
+      <Card className="w-full border-[var(--border-default)] shadow-[var(--shadow-lg)]">
         <CardHeader className="text-center">
           <CardTitle className="font-[family-name:var(--font-display)] text-2xl">
             Start free
@@ -78,20 +79,25 @@ export default function RegisterPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
-              <div className="flex gap-2">
+              <div className="relative flex">
                 <Input
                   id="password"
                   type={showPw ? "text" : "password"}
-                  className={cn(errors.password && "border-[var(--danger)] ring-1 ring-[var(--danger)]")}
+                  className={cn(
+                    "min-h-11 pr-12",
+                    errors.password && "border-[var(--danger)] ring-1 ring-[var(--danger)]",
+                  )}
                   {...register("password")}
                 />
                 <Button
                   type="button"
-                  variant="secondary"
-                  className="min-h-11 shrink-0 px-3"
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-1 top-1/2 min-h-9 min-w-9 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)]"
                   onClick={() => setShowPw((s) => !s)}
+                  aria-label={showPw ? "Hide password" : "Show password"}
                 >
-                  {showPw ? "Hide" : "Show"}
+                  {showPw ? <EyeOff className="size-5" aria-hidden /> : <Eye className="size-5" aria-hidden />}
                 </Button>
               </div>
               {errors.password ? (
