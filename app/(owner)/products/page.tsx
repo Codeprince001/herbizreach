@@ -88,7 +88,7 @@ export default function ProductsPage() {
           actionHref="/products/new"
         />
       ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-[repeat(auto-fill,minmax(240px,1fr))] sm:gap-4 md:gap-5">
           {filtered.map((p, i) => (
             <ProductCard
               key={p.id}
