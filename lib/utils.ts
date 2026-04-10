@@ -5,9 +5,12 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatCurrency(amount: number | string): string {
+export function formatCurrency(
+  amount: number | string | null | undefined,
+): string {
+  if (amount == null || amount === "") return "₦0";
   const n = typeof amount === "string" ? parseFloat(amount) : amount;
-  if (Number.isNaN(n)) return "₦0";
+  if (typeof n !== "number" || !Number.isFinite(n)) return "₦0";
   const isWhole = Math.abs(n - Math.round(n)) < 0.001;
   return `₦${n.toLocaleString("en-NG", {
     maximumFractionDigits: isWhole ? 0 : 2,
