@@ -17,6 +17,12 @@ export async function fetchPublicStore(slug: string): Promise<PublicStorePayload
   }
 }
 
+/** Matches `GET /store/:slug/products/:productId` — body is `{ business, product }`, not a bare product. */
+type PublicProductApiPayload = {
+  business: { id: string; businessName: string; businessSlug: string };
+  product: Product;
+};
+
 export async function fetchPublicProduct(
   slug: string,
   productId: string,
@@ -26,7 +32,9 @@ export async function fetchPublicProduct(
       next: { revalidate: 60 },
     });
     if (!res.ok) return null;
-    return (await res.json()) as Product;
+    const data = (await res.json()) as PublicProductApiPayload;
+    if (!data?.product?.id || !data.product.name) return null;
+    return data.product;
   } catch {
     return null;
   }
