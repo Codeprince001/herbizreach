@@ -2,17 +2,50 @@
 
 import { motion } from "framer-motion";
 import {
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
   Link2,
+  Menu,
   MessageCircle,
   Sparkles,
+  Star,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
+import { Sheet, SheetClose, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+
+function TestimonialStars({ rating }: { rating: number }) {
+  const clamped = Math.min(5, Math.max(0, Math.round(rating)));
+  return (
+    <div
+      className="mb-5 flex gap-1"
+      role="img"
+      aria-label={`${clamped} out of 5 stars`}
+    >
+      {Array.from({ length: 5 }, (_, i) => {
+        const filled = i < clamped;
+        return (
+          <Star
+            key={i}
+            className={cn(
+              "size-6 shrink-0 md:size-7",
+              filled
+                ? "fill-[var(--warning)] text-[var(--warning)]"
+                : "fill-transparent text-[var(--border-strong)] opacity-40",
+            )}
+            strokeWidth={filled ? 0 : 1.5}
+            aria-hidden
+          />
+        );
+      })}
+    </div>
+  );
+}
 
 const features = [
   {
@@ -46,31 +79,37 @@ const testimonials = [
     quote: "I got more orders the week I launched my HerBizReach page.",
     name: "Chioma O.",
     role: "Fashion retailer, Lagos",
+    rating: 5,
   },
   {
     quote: "Finally a tool that looks good on my phone and takes minutes, not days.",
     name: "Amara K.",
     role: "Skincare brand, Abuja",
+    rating: 5,
   },
   {
     quote: "The AI helped me sound professional without hiring a copywriter.",
     name: "Yemi T.",
     role: "Home decor, Port Harcourt",
+    rating: 5,
   },
   {
     quote: "I shared my link once on WhatsApp status and sold out in two days.",
     name: "Bolanle A.",
     role: "Food business, Ibadan",
+    rating: 5,
   },
   {
     quote: "Customers now see my full catalog without me sending 20 photos manually.",
     name: "Nneka U.",
     role: "Accessories seller, Enugu",
+    rating: 4,
   },
   {
     quote: "The dashboard helped me know which products people actually care about.",
     name: "Ruth E.",
     role: "Beauty products, Benin City",
+    rating: 5,
   },
 ];
 
@@ -119,7 +158,37 @@ export default function LandingPage() {
         <span className="font-[family-name:var(--font-display)] text-lg font-bold text-[var(--brand-primary)]">
           HerBizReach
         </span>
-        <div className="flex items-center gap-2">
+        <div className="md:hidden">
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="min-h-11 min-w-11" aria-label="Open menu">
+                <Menu className="size-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="space-y-4 pt-12">
+              <p className="font-[family-name:var(--font-display)] text-lg font-bold text-[var(--brand-primary)]">
+                HerBizReach
+              </p>
+              <div className="space-y-2">
+                <SheetClose asChild>
+                  <Button asChild variant="secondary" className="w-full justify-start">
+                    <Link href="/login">Log in</Link>
+                  </Button>
+                </SheetClose>
+                <SheetClose asChild>
+                  <Button asChild className="w-full justify-start">
+                    <Link href="/register">Get started</Link>
+                  </Button>
+                </SheetClose>
+                <div className="pt-2">
+                  <ThemeToggle />
+                </div>
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
+
+        <div className="hidden items-center gap-2 md:flex">
           <ThemeToggle />
           <Button asChild variant="ghost" className="min-h-10">
             <Link href="/login">Log in</Link>
@@ -132,35 +201,28 @@ export default function LandingPage() {
 
       <section className="relative overflow-hidden px-4 pb-16 pt-8 md:px-8 md:pb-24 md:pt-12">
         <div
-          className="pointer-events-none absolute inset-0 opacity-40"
+          aria-hidden
+          className="pointer-events-none absolute inset-0"
           style={{
             background:
-              "radial-gradient(ellipse 80% 60% at 50% -20%, var(--brand-glow), transparent), radial-gradient(ellipse 60% 50% at 100% 50%, rgba(124,58,237,0.12), transparent)",
+              "radial-gradient(ellipse 110% 75% at 50% -25%, var(--brand-glow), transparent 58%), radial-gradient(ellipse 55% 45% at 95% 15%, rgba(167,139,250,0.2), transparent 52%), radial-gradient(ellipse 50% 55% at 5% 90%, rgba(124,58,237,0.1), transparent 55%)",
           }}
         />
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-[0.14]"
+          className="pointer-events-none absolute inset-0 opacity-[0.45]"
           style={{
             backgroundImage:
-              "linear-gradient(to right, rgba(124,58,237,0.22) 1px, transparent 1px), linear-gradient(to bottom, rgba(124,58,237,0.22) 1px, transparent 1px)",
-            backgroundSize: "34px 34px",
+              "radial-gradient(circle at center, rgba(124,58,237,0.28) 1.2px, transparent 1.3px)",
+            backgroundSize: "22px 22px",
           }}
         />
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-[0.22]"
+          className="pointer-events-none absolute inset-0 opacity-[0.35]"
           style={{
             backgroundImage:
-              "radial-gradient(circle at 20% 22%, rgba(167,139,250,0.22) 0%, transparent 24%), radial-gradient(circle at 78% 18%, rgba(124,58,237,0.2) 0%, transparent 28%), radial-gradient(circle at 72% 74%, rgba(124,58,237,0.16) 0%, transparent 26%)",
-          }}
-        />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-[0.08]"
-          style={{
-            backgroundImage:
-              "repeating-linear-gradient(-25deg, rgba(124,58,237,0.3), rgba(124,58,237,0.3) 1px, transparent 1px, transparent 12px)",
+              "radial-gradient(circle at 30% 40%, rgba(167,139,250,0.35) 0%, transparent 42%), radial-gradient(circle at 75% 65%, rgba(124,58,237,0.2) 0%, transparent 38%)",
           }}
         />
         <div className="relative mx-auto flex max-w-6xl flex-col items-center gap-10 lg:flex-row lg:items-center lg:justify-between">
@@ -196,16 +258,26 @@ export default function LandingPage() {
               src="/herbizzreach_mobile.png"
               alt="HerBizReach mobile app preview"
               width={342}
-              height={663}
-              priority
-              className="mx-auto h-auto w-[min(100%,342px)] drop-shadow-[0_18px_36px_rgba(0,0,0,0.35)]"
+              height={516}
+              loading="eager"
+              className="mx-auto drop-shadow-[0_18px_36px_rgba(0,0,0,0.35)]"
             />
           </motion.div>
         </div>
       </section>
 
       <section className="border-t border-[var(--border-default)] bg-[var(--bg-subtle)] px-4 py-16 md:px-8">
-        <div className="mx-auto grid max-w-5xl gap-8 md:grid-cols-3">
+        <div className="mx-auto max-w-5xl">
+          <div className="mb-10 text-center md:mb-12">
+            <h2 className="font-[family-name:var(--font-display)] text-2xl font-bold tracking-tight text-[var(--text-primary)] md:text-3xl">
+              Built for how you actually sell
+            </h2>
+            <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-[var(--text-muted)] md:text-base">
+              AI copy, a shareable storefront, and WhatsApp in one flow — so you spend less time on admin
+              and more time closing conversations.
+            </p>
+          </div>
+          <div className="grid gap-8 md:grid-cols-3">
           {features.map((f, i) => {
             const Icon = f.icon;
             return (
@@ -231,19 +303,20 @@ export default function LandingPage() {
               </motion.div>
             );
           })}
+          </div>
         </div>
       </section>
 
-      <section className="px-4 py-16 md:px-8">
-        <h2 className="text-center font-[family-name:var(--font-display)] text-2xl font-bold text-[var(--text-primary)]">
+      <section className="px-4 py-20 md:px-8 md:py-24">
+        <h2 className="text-center font-[family-name:var(--font-display)] text-3xl font-bold tracking-tight text-[var(--text-primary)] md:text-4xl">
           What founders say
         </h2>
-        <p className="mx-auto mt-3 max-w-2xl text-center text-sm text-[var(--text-muted)]">
+        <p className="mx-auto mt-4 max-w-2xl text-center text-base leading-relaxed text-[var(--text-muted)] md:text-lg">
           Real stories from women entrepreneurs using HerBizReach to grow visibility, simplify selling, and
           convert more chats into orders.
         </p>
 
-        <div className="mx-auto mt-10 max-w-5xl overflow-hidden">
+        <div className="mx-auto mt-12 max-w-6xl overflow-hidden md:mt-14">
           <motion.div
             animate={{ x: `-${activeIndex * 100}%` }}
             transition={{ duration: 0.35 }}
@@ -255,19 +328,24 @@ export default function LandingPage() {
 
               return (
                 <div key={slideIndex} className="w-full shrink-0">
-                  <div className="grid gap-6 md:grid-cols-2">
+                  <div className="grid gap-8 md:grid-cols-2 md:gap-10">
                     {slice.map((t) => (
                       <motion.blockquote
                         key={t.name}
                         initial={{ opacity: 0, y: 10 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        className="rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--bg-card)] p-6 shadow-[var(--shadow-sm)]"
+                        className="rounded-[var(--radius-xl)] border border-[var(--border-default)] bg-[var(--bg-card)] p-8 shadow-[var(--shadow-md)] md:p-10"
                       >
-                        <p className="text-sm leading-6 text-[var(--text-secondary)]">&ldquo;{t.quote}&rdquo;</p>
-                        <footer className="mt-4 text-xs font-semibold text-[var(--brand-primary)]">
-                          {t.name}
-                          <span className="block font-normal text-[var(--text-muted)]">{t.role}</span>
+                        <TestimonialStars rating={t.rating} />
+                        <p className="text-lg font-medium leading-relaxed text-[var(--text-primary)] md:text-xl md:leading-relaxed">
+                          &ldquo;{t.quote}&rdquo;
+                        </p>
+                        <footer className="mt-6 border-t border-[var(--border-default)] pt-6">
+                          <p className="font-[family-name:var(--font-display)] text-base font-bold text-[var(--brand-primary)] md:text-lg">
+                            {t.name}
+                          </p>
+                          <p className="mt-1 text-sm text-[var(--text-muted)] md:text-base">{t.role}</p>
                         </footer>
                       </motion.blockquote>
                     ))}
@@ -321,12 +399,18 @@ export default function LandingPage() {
             {faqs.map((faq) => (
               <details
                 key={faq.q}
-                className="group rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--bg-card)] p-5"
+                className="hbr-faq group rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--bg-card)] p-5 transition-shadow hover:shadow-[var(--shadow-sm)]"
               >
-                <summary className="cursor-pointer list-none pr-6 text-sm font-semibold text-[var(--text-primary)]">
-                  {faq.q}
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold text-[var(--text-primary)] [&::-webkit-details-marker]:hidden [&::marker]:hidden">
+                  <span className="min-w-0 flex-1 text-left leading-snug">{faq.q}</span>
+                  <ChevronDown
+                    className="hbr-faq-chevron size-5 shrink-0 text-[var(--brand-primary)]"
+                    aria-hidden
+                  />
                 </summary>
-                <p className="mt-3 text-sm leading-6 text-[var(--text-muted)]">{faq.a}</p>
+                <p className="mt-3 border-t border-[var(--border-default)] pt-3 text-sm leading-6 text-[var(--text-muted)]">
+                  {faq.a}
+                </p>
               </details>
             ))}
           </div>
