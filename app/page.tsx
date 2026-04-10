@@ -7,8 +7,8 @@ import {
   Link2,
   MessageCircle,
   Sparkles,
-  Store,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
@@ -138,6 +138,31 @@ export default function LandingPage() {
               "radial-gradient(ellipse 80% 60% at 50% -20%, var(--brand-glow), transparent), radial-gradient(ellipse 60% 50% at 100% 50%, rgba(124,58,237,0.12), transparent)",
           }}
         />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 opacity-[0.14]"
+          style={{
+            backgroundImage:
+              "linear-gradient(to right, rgba(124,58,237,0.22) 1px, transparent 1px), linear-gradient(to bottom, rgba(124,58,237,0.22) 1px, transparent 1px)",
+            backgroundSize: "34px 34px",
+          }}
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 opacity-[0.22]"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle at 20% 22%, rgba(167,139,250,0.22) 0%, transparent 24%), radial-gradient(circle at 78% 18%, rgba(124,58,237,0.2) 0%, transparent 28%), radial-gradient(circle at 72% 74%, rgba(124,58,237,0.16) 0%, transparent 26%)",
+          }}
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 opacity-[0.08]"
+          style={{
+            backgroundImage:
+              "repeating-linear-gradient(-25deg, rgba(124,58,237,0.3), rgba(124,58,237,0.3) 1px, transparent 1px, transparent 12px)",
+          }}
+        />
         <div className="relative mx-auto flex max-w-6xl flex-col items-center gap-10 lg:flex-row lg:items-center lg:justify-between">
           <motion.div
             initial={{ opacity: 0, y: 16 }}
@@ -165,21 +190,16 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.08 }}
-            className="relative w-full max-w-sm"
+            className="relative hidden w-full max-w-sm lg:block"
           >
-            <div className="mx-auto aspect-[9/19] w-[min(100%,280px)] rounded-[2rem] border-4 border-[var(--border-strong)] bg-[var(--bg-card)] p-3 shadow-[var(--shadow-lg)]">
-              <div className="flex h-full flex-col rounded-[1.5rem] bg-[var(--bg-subtle)] p-4">
-                <div className="flex items-center gap-2 border-b border-[var(--border-default)] pb-3">
-                  <Store className="size-5 text-[var(--brand-primary)]" />
-                  <span className="text-sm font-semibold">Your dashboard</span>
-                </div>
-                <div className="mt-4 space-y-2">
-                  <div className="h-16 rounded-[var(--radius-md)] bg-[var(--brand-glow)]" />
-                  <div className="h-10 rounded-[var(--radius-md)] bg-[var(--bg-muted)]" />
-                  <div className="h-10 rounded-[var(--radius-md)] bg-[var(--bg-muted)]" />
-                </div>
-              </div>
-            </div>
+            <Image
+              src="/herbizzreach_mobile.png"
+              alt="HerBizReach mobile app preview"
+              width={342}
+              height={663}
+              priority
+              className="mx-auto h-auto w-[min(100%,342px)] drop-shadow-[0_18px_36px_rgba(0,0,0,0.35)]"
+            />
           </motion.div>
         </div>
       </section>
