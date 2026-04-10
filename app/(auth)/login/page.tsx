@@ -27,8 +27,8 @@ export default function LoginPage() {
   } = useForm<FormValues>({ resolver: zodResolver(schema) });
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[var(--bg-subtle)] px-4 py-10">
-      <Card className="w-full max-w-[440px] border-[var(--border-default)] shadow-[var(--shadow-lg)]">
+    <div className="w-full max-w-[440px]">
+      <Card className="w-full border-[var(--border-default)] shadow-[var(--shadow-lg)]">
         <CardHeader className="text-center">
           <CardTitle className="font-[family-name:var(--font-display)] text-2xl">
             Welcome back
@@ -51,7 +51,15 @@ export default function LoginPage() {
               ) : null}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <div className="flex items-center justify-between gap-2">
+                <Label htmlFor="password">Password</Label>
+                <Link
+                  href="/forgot-password"
+                  className="text-xs font-medium text-[var(--brand-primary)] hover:underline"
+                >
+                  Forgot password?
+                </Link>
+              </div>
               <Input
                 id="password"
                 type="password"
