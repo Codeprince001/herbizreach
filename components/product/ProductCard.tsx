@@ -16,6 +16,7 @@ export function ProductCard(props: {
   onDelete?: () => void;
 }) {
   const { product, viewCount = 0, index = 0, onDelete } = props;
+  const imageSrc = product.imageUrl?.trim() ?? "";
   return (
     <motion.div
       layout
@@ -26,14 +27,20 @@ export function ProductCard(props: {
         "overflow-hidden rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--bg-card)] shadow-[var(--shadow-sm)]",
       )}
     >
-      <div className="relative aspect-[4/3] w-full bg-[var(--bg-muted)]">
-        <Image
-          src={product.imageUrl}
-          alt={product.name}
-          fill
-          className="object-cover"
-          sizes="(max-width:768px) 100vw, 50vw"
-        />
+      <div className="relative aspect-[4/3] w-full bg-[var(--bg-muted)] md:aspect-[3/2]">
+        {imageSrc ? (
+          <Image
+            src={imageSrc}
+            alt={product.name}
+            fill
+            className="object-cover"
+            sizes="(max-width:640px) 100vw, (max-width:1024px) 45vw, 280px"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center text-xs text-[var(--text-muted)]">
+            No photo
+          </div>
+        )}
         <div className="absolute right-2 top-2">
           <Badge variant={product.isPublished ? "success" : "secondary"}>
             {product.isPublished ? "Live" : "Draft"}
@@ -60,7 +67,7 @@ export function ProductCard(props: {
               type="button"
               variant="destructive"
               size="sm"
-              className="min-h-10 shrink-0 px-3"
+              className="min-h-9 shrink-0 px-2.5 md:min-h-10 md:px-3"
               onClick={onDelete}
               aria-label="Delete product"
             >
