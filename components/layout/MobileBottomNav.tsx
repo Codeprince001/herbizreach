@@ -5,15 +5,14 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useChatStore } from "@/stores/useChatStore";
 import { ownerNav } from "./nav-config";
-import { ThemeToggle } from "./ThemeToggle";
 
 export function MobileBottomNav() {
   const pathname = usePathname();
   const unreadBump = useChatStore((s) => s.unreadBump);
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 flex h-16 items-center justify-between border-t border-[var(--border-default)] bg-[var(--bg-card)] px-2 pb-safe shadow-[var(--shadow-md)] md:hidden">
-      <div className="flex flex-1 justify-around">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 flex h-16 items-center justify-center border-t border-[var(--border-default)] bg-[var(--bg-card)] px-2 pb-safe shadow-[var(--shadow-md)] md:hidden">
+      <div className="flex w-full max-w-lg justify-around">
         {ownerNav.map((item) => {
           const Icon = item.icon;
           const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
@@ -30,14 +29,13 @@ export function MobileBottomNav() {
               <Icon className="size-5" />
               <span>{item.label}</span>
               {showDot ? (
-                <span className="absolute right-1 top-1 size-2 rounded-full bg-[var(--danger)]" />
+                <span className="absolute -right-0.5 -top-0.5 flex min-h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[var(--danger)] px-1 text-[10px] font-bold leading-none text-white">
+                  {unreadBump > 9 ? "9+" : unreadBump}
+                </span>
               ) : null}
             </Link>
           );
         })}
-      </div>
-      <div className="flex shrink-0 border-l border-[var(--border-default)] pl-1">
-        <ThemeToggle />
       </div>
     </nav>
   );
