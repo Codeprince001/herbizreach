@@ -280,7 +280,7 @@ export default function LandingPage() {
 
         <div className="mt-6 flex items-center justify-center gap-3">
           <Button
-            variant="outline"
+            variant="secondary"
             size="icon"
             className="min-h-11 min-w-11"
             onClick={() => setActiveIndex((prev) => (prev - 1 + totalSlides) % totalSlides)}
@@ -299,7 +299,7 @@ export default function LandingPage() {
             />
           ))}
           <Button
-            variant="outline"
+            variant="secondary"
             size="icon"
             className="min-h-11 min-w-11"
             onClick={() => setActiveIndex((prev) => (prev + 1) % totalSlides)}
