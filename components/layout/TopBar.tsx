@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, Menu } from "lucide-react";
+import { Bell } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -11,9 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useAuthStore } from "@/stores/useAuthStore";
-import { ownerNav, ownerNavExtra } from "./nav-config";
 import { ThemeToggle } from "./ThemeToggle";
 
 const titles: Record<string, string> = {
@@ -42,57 +40,18 @@ export function TopBar() {
 
   return (
     <header className="sticky top-0 z-40 flex h-14 items-center justify-between gap-3 border-b border-[var(--border-default)] bg-[var(--bg-base)]/95 px-4 backdrop-blur-md md:h-16 md:px-6">
-      <div className="flex min-w-0 items-center gap-2">
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="md:hidden"
-              aria-label="Open menu"
-            >
-              <Menu className="size-5" />
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="left" className="gap-4">
-            <Link
-              href="/dashboard"
-              className="font-[family-name:var(--font-display)] text-lg font-bold text-[var(--brand-primary)]"
-            >
-              HerBizReach
-            </Link>
-            <nav className="flex flex-col gap-1 pt-4">
-              {[...ownerNav, ...ownerNavExtra].map((item) => {
-                const Icon = item.icon;
-                const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={`flex min-h-11 items-center gap-3 rounded-[var(--radius-md)] px-3 text-sm font-medium ${
-                      active
-                        ? "bg-[var(--brand-glow)] text-[var(--brand-primary)]"
-                        : "text-[var(--text-secondary)] hover:bg-[var(--bg-muted)]"
-                    }`}
-                  >
-                    <Icon className="size-5 shrink-0" />
-                    {item.label}
-                  </Link>
-                );
-              })}
-            </nav>
-          </SheetContent>
-        </Sheet>
+      <div className="flex min-w-0 flex-1 items-center gap-2">
         <Link
           href="/dashboard"
-          className="hidden font-[family-name:var(--font-display)] text-lg font-bold text-[var(--brand-primary)] md:block"
+          className="hidden shrink-0 font-[family-name:var(--font-display)] text-lg font-bold text-[var(--brand-primary)] md:inline"
         >
           HerBizReach
         </Link>
-        <span className="truncate font-[family-name:var(--font-display)] text-base font-semibold text-[var(--text-primary)] md:hidden">
-          {mobileTitle}
-        </span>
+        {pathname !== "/dashboard" ? (
+          <span className="min-w-0 flex-1 truncate font-[family-name:var(--font-display)] text-base font-semibold text-[var(--text-primary)] md:hidden">
+            {mobileTitle}
+          </span>
+        ) : null}
       </div>
 
       <div className="flex items-center gap-1">
