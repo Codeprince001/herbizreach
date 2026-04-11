@@ -6,6 +6,7 @@ export type UpdateStoreSettingsPayload = {
   bannerUrl?: string;
   accentColor?: string;
   tagline?: string;
+  description?: string;
   showChatWidget?: boolean;
 };
 

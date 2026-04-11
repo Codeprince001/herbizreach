@@ -10,7 +10,10 @@ export async function generateMetadata({ params }: Props) {
   if (!data) return { title: "Store" };
   return {
     title: `${data.business.businessName} | HerBizReach`,
-    description: data.storeSettings?.tagline ?? `Shop ${data.business.businessName}`,
+    description:
+      data.storeSettings?.description?.trim() ||
+      data.storeSettings?.tagline ||
+      `Shop ${data.business.businessName}`,
   };
 }
 

@@ -11,7 +11,7 @@ import { EmptyState } from "@/components/shared/EmptyState";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { LoadingSkeleton } from "@/components/shared/LoadingSkeleton";
 import { useAnalyticsOverview } from "@/hooks/useAnalytics";
-import { useDeleteProduct, useProducts } from "@/hooks/useProducts";
+import { useDeleteProduct, useDuplicateProduct, useProducts } from "@/hooks/useProducts";
 import { cn } from "@/lib/utils";
 
 type Filter = "all" | "published" | "draft";
@@ -20,6 +20,7 @@ export default function ProductsPage() {
   const { data, isLoading } = useProducts();
   const { data: analytics } = useAnalyticsOverview();
   const deleteProduct = useDeleteProduct();
+  const duplicateProduct = useDuplicateProduct();
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState<Filter>("all");
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -96,6 +97,7 @@ export default function ProductsPage() {
               viewCount={views.get(p.id) ?? 0}
               index={i}
               onDelete={() => setDeleteId(p.id)}
+              onDuplicate={() => duplicateProduct.mutate(p.id)}
             />
           ))}
         </div>

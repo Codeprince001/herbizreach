@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { ArrowLeft, MessageCircle, Sparkles, Store } from "lucide-react";
+import { BrandLogo } from "@/components/layout/BrandLogo";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { Button } from "@/components/ui/button";
 
@@ -68,9 +69,10 @@ export function AuthLayout({ children }: { children: ReactNode }) {
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/70">
                 Women-led business toolkit
               </p>
-              <h1 className="font-[family-name:var(--font-display)] text-4xl font-extrabold leading-[1.1] tracking-tight text-white lg:text-[2.75rem]">
-                HerBizReach
-              </h1>
+              <div className="flex justify-center">
+                <BrandLogo href="/" heightClass="h-14 lg:h-16" withLightPanel priority />
+              </div>
+              <h1 className="sr-only">HerBizReach</h1>
               <p className="text-base leading-relaxed text-white/88 lg:text-lg">
                 Your business, seen by more. Share your catalog, sharpen your copy with AI, and meet
                 customers on WhatsApp — built for bold SMEs across Africa.
@@ -105,12 +107,7 @@ export function AuthLayout({ children }: { children: ReactNode }) {
 
       <div className="flex min-h-0 min-h-screen flex-1 flex-col bg-[var(--bg-subtle)]">
         <div className="flex items-center justify-between border-b border-[var(--border-default)] bg-[var(--bg-base)] px-4 py-3 md:hidden">
-          <Link
-            href="/"
-            className="font-[family-name:var(--font-display)] text-lg font-bold text-[var(--brand-primary)]"
-          >
-            HerBizReach
-          </Link>
+          <BrandLogo href="/" heightClass="h-9" />
           <ThemeToggle />
         </div>
         <main className="flex flex-1 flex-col items-center justify-center px-4 py-10 md:px-8 md:py-12">

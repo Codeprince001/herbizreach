@@ -3,11 +3,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { AiSuggestionPanel } from "@/components/product/AiSuggestionPanel";
-import { ImageUploader } from "@/components/product/ImageUploader";
+import { MultiImageUploader } from "@/components/product/MultiImageUploader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -35,8 +35,8 @@ export default function NewProductPage() {
   const createProduct = useCreateProduct();
   const improve = useImproveDescription();
   const { data: categories } = useCategories();
-  const [file, setFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
+  const previewUrls = useMemo(() => files.map((f) => URL.createObjectURL(f)), [files]);
   const [aiOpen, setAiOpen] = useState(false);
   const [aiResult, setAiResult] = useState({ description_ai: "", caption_ai: "" });
 
@@ -53,10 +53,8 @@ export default function NewProductPage() {
 
   const desc = watch("descriptionRaw");
 
-  function onFile(f: File | null) {
-    setFile(f);
-    if (preview) URL.revokeObjectURL(preview);
-    setPreview(f ? URL.createObjectURL(f) : null);
+  function onFilesChange(next: File[]) {
+    setFiles(next);
   }
 
   async function runAi() {
@@ -77,11 +75,11 @@ export default function NewProductPage() {
   }
 
   function onSubmit(values: FormValues) {
-    if (!file) {
+    if (!files.length) {
       return;
     }
     const fd = new FormData();
-    fd.append("image", file);
+    files.forEach((f) => fd.append("images", f));
     fd.append("name", values.name);
     fd.append("price", values.price);
     fd.append("descriptionRaw", values.descriptionRaw);
@@ -99,16 +97,16 @@ export default function NewProductPage() {
 
   return (
     <div className="mx-auto max-w-xl space-y-6 pb-24">
-      <PageHeader title="Add product" description="Photo first, then details." />
+      <PageHeader title="Add product" description="Photos first (up to 8), then details." />
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
         <Card className="border-[var(--border-default)]">
           <CardHeader>
-            <CardTitle className="text-base">Step 1 — Photo</CardTitle>
+            <CardTitle className="text-base">Step 1 — Photos</CardTitle>
           </CardHeader>
           <CardContent>
-            <ImageUploader file={file} previewUrl={preview} onFile={onFile} />
-            {!file ? (
-              <p className="mt-2 text-xs text-[var(--danger)]">Image is required</p>
+            <MultiImageUploader files={files} previewUrls={previewUrls} onChange={onFilesChange} />
+            {!files.length ? (
+              <p className="mt-2 text-xs text-[var(--danger)]">At least one photo is required</p>
             ) : null}
           </CardContent>
         </Card>
@@ -205,7 +203,7 @@ export default function NewProductPage() {
           </CardContent>
         </Card>
 
-        <Button type="submit" className="min-h-11 w-full" disabled={createProduct.isPending || !file}>
+        <Button type="submit" className="min-h-11 w-full" disabled={createProduct.isPending || !files.length}>
           {createProduct.isPending ? (
             <>
               <Loader2 className="mr-2 size-4 animate-spin" />

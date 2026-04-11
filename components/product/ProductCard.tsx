@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { Pencil, Trash2 } from "lucide-react";
+import { Copy, Pencil, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn, formatCurrency } from "@/lib/utils";
@@ -14,9 +14,11 @@ export function ProductCard(props: {
   viewCount?: number;
   index?: number;
   onDelete?: () => void;
+  onDuplicate?: () => void;
 }) {
-  const { product, viewCount = 0, index = 0, onDelete } = props;
-  const imageSrc = product.imageUrl?.trim() ?? "";
+  const { product, viewCount = 0, index = 0, onDelete, onDuplicate } = props;
+  const imageSrc =
+    product.imageUrls?.[0]?.trim() || product.imageUrl?.trim() || "";
   return (
     <motion.div
       layout
@@ -55,13 +57,25 @@ export function ProductCard(props: {
           {formatCurrency(product.price)}
         </p>
         <p className="text-xs text-[var(--text-muted)]">{viewCount} views</p>
-        <div className="flex gap-2 pt-1">
-          <Button asChild variant="secondary" size="sm" className="min-h-10 flex-1">
+        <div className="flex flex-wrap gap-2 pt-1">
+          <Button asChild variant="secondary" size="sm" className="min-h-10 min-w-[5.5rem] flex-1">
             <Link href={`/products/${product.id}`}>
               <Pencil className="mr-1 size-4" />
               Edit
             </Link>
           </Button>
+          {onDuplicate ? (
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              className="min-h-10 min-w-[5.5rem] flex-1"
+              onClick={onDuplicate}
+            >
+              <Copy className="mr-1 size-4" />
+              Duplicate
+            </Button>
+          ) : null}
           {onDelete ? (
             <Button
               type="button"

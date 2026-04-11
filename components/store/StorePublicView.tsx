@@ -90,6 +90,11 @@ export function StorePublicView(props: { initial: PublicStorePayload }) {
                   {initial.storeSettings.tagline}
                 </p>
               ) : null}
+              {initial.storeSettings?.description ? (
+                <p className="mt-3 max-w-2xl whitespace-pre-wrap text-sm leading-relaxed text-[var(--text-muted)]">
+                  {initial.storeSettings.description}
+                </p>
+              ) : null}
             </div>
             <div className="flex flex-wrap gap-2">
               <WhatsAppShareButton phone={waPhone} message={waMsg} />

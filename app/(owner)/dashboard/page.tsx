@@ -3,12 +3,12 @@
 import {
   ArrowUpRight,
   Bell,
+  Copy,
   Eye,
   Link2,
   MoreVertical,
   RefreshCw,
   Send,
-  Sparkles,
   Star,
   Users,
 } from "lucide-react";
@@ -25,16 +25,18 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { EngagementChart } from "@/components/analytics/EngagementChart";
+import { BrandLogo } from "@/components/layout/BrandLogo";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { SectionError } from "@/components/shared/SectionError";
 import { LoadingSkeleton } from "@/components/shared/LoadingSkeleton";
 import { useAnalyticsOverview } from "@/hooks/useAnalytics";
 import { useLeads } from "@/hooks/useLeads";
-import { useProducts } from "@/hooks/useProducts";
+import { useDuplicateProduct, useProducts } from "@/hooks/useProducts";
 import { useStoreSettings } from "@/hooks/useStoreSettings";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { firstName, formatCurrency } from "@/lib/utils";
 import type { Product } from "@/types/product.types";
+import { normalizeWaMeDigits } from "@/lib/ng-whatsapp-phone";
 import { cn } from "@/lib/utils";
 
 function formatCompact(n: number): string {
@@ -56,7 +58,7 @@ function trendFromDaily(daily: { count: number }[]): { pct: number; up: boolean 
 
 function waMeLink(phone: string | null | undefined, text: string): string | null {
   if (!phone?.trim()) return null;
-  const digits = phone.replace(/\D/g, "");
+  const digits = normalizeWaMeDigits(phone);
   if (!digits) return null;
   return `https://wa.me/${digits}?text=${encodeURIComponent(text)}`;
 }
@@ -68,6 +70,8 @@ function DashboardMetricCard({
   trend,
   iconBg,
   iconClassName,
+  trendCompareSuffix = "vs last 7 days",
+  periodHintWhenNoTrend = "vs last 7 days",
 }: {
   label: string;
   value: string | number;
@@ -75,6 +79,8 @@ function DashboardMetricCard({
   trend: { pct: number; up: boolean } | null;
   iconBg: string;
   iconClassName: string;
+  trendCompareSuffix?: string;
+  periodHintWhenNoTrend?: string;
 }) {
   return (
     <div className="min-w-[140px] shrink-0 snap-start rounded-2xl bg-[var(--bg-card)] p-3.5 shadow-[var(--shadow-sm)] ring-1 ring-[var(--border-default)] md:min-w-0">
@@ -97,10 +103,10 @@ function DashboardMetricCard({
           >
             {trend.up ? "↗" : "↘"} {trend.pct}%
           </span>
-          <span className="text-[var(--text-muted)]"> vs last 7 days</span>
+          <span className="text-[var(--text-muted)]"> {trendCompareSuffix}</span>
         </p>
       ) : (
-        <p className="mt-1.5 text-xs text-[var(--text-muted)]">vs last 7 days</p>
+        <p className="mt-1.5 text-xs text-[var(--text-muted)]">{periodHintWhenNoTrend}</p>
       )}
     </div>
   );
@@ -112,12 +118,13 @@ function DashboardMobileHeader() {
 
   return (
     <div className="mb-6 flex items-center justify-between md:hidden">
-      <Link href="/dashboard" className="flex items-center gap-2 text-white">
-        <Sparkles className="size-6 shrink-0 text-white" aria-hidden />
-        <span className="font-[family-name:var(--font-display)] text-lg font-bold tracking-tight">
-          HerBizReach
-        </span>
-      </Link>
+      <BrandLogo
+        href="/dashboard"
+        withLightPanel
+        heightClass="h-10"
+        wordmarkClassName="text-white text-lg"
+        linkClassName="text-white"
+      />
       <div className="flex items-center gap-1">
         <Button
           type="button"
@@ -168,6 +175,7 @@ export default function DashboardPage() {
   const { data, isLoading, isError, refetch, isFetching } = useAnalyticsOverview();
   const { data: leads } = useLeads();
   const { data: allProducts } = useProducts();
+  const duplicateProduct = useDuplicateProduct({ navigateToEdit: false });
   const { data: storeSettings } = useStoreSettings();
 
   const views7d = data?.viewsLast7Days.reduce((a, b) => a + b.count, 0) ?? 0;
@@ -265,11 +273,13 @@ export default function DashboardPage() {
         <div className="flex gap-3 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] md:grid md:grid-cols-4 md:gap-4 md:overflow-visible [&::-webkit-scrollbar]:hidden">
           <DashboardMetricCard
             label="Reach"
-            value={formatCompact(data.totals.pageViews)}
+            value={formatCompact(views7d)}
             icon={Eye}
             trend={trend}
             iconBg="bg-violet-100 dark:bg-violet-500/20"
             iconClassName="text-violet-800 dark:text-violet-200"
+            trendCompareSuffix="vs earlier this week"
+            periodHintWhenNoTrend="Last 7 days · page views on your store"
           />
           <DashboardMetricCard
             label="Shares"
@@ -326,6 +336,7 @@ export default function DashboardPage() {
                 product={p}
                 views={viewById.get(p.id) ?? 0}
                 shares={shareById.get(p.id) ?? 0}
+                onDuplicate={() => duplicateProduct.mutate(p.id)}
               />
             ))
           )}
@@ -418,15 +429,17 @@ function ProductRow({
   product: p,
   views,
   shares: _shares,
+  onDuplicate,
 }: {
   product: Product;
   views: number;
   shares: number;
+  onDuplicate?: () => void;
 }) {
   const businessSlug = useAuthStore((s) => s.user?.businessSlug);
   const desc = p.descriptionAi?.trim() || p.descriptionRaw?.trim() || "No description yet.";
   const short = desc.length > 72 ? `${desc.slice(0, 72)}…` : desc;
-  const imageSrc = p.imageUrl?.trim() ?? "";
+  const imageSrc = p.imageUrls?.[0]?.trim() ?? p.imageUrl?.trim() ?? "";
 
   return (
     <div className="flex overflow-hidden rounded-2xl border border-[var(--border-default)] bg-[var(--bg-card)] shadow-[var(--shadow-sm)]">
@@ -474,6 +487,15 @@ function ProductRow({
               <DropdownMenuItem asChild>
                 <Link href={`/products/${p.id}`}>Edit product</Link>
               </DropdownMenuItem>
+              {onDuplicate ? (
+                <DropdownMenuItem
+                  onClick={() => onDuplicate()}
+                  className="cursor-pointer"
+                >
+                  <Copy className="mr-2 size-4" />
+                  Duplicate as draft
+                </DropdownMenuItem>
+              ) : null}
               {businessSlug && p.isPublished ? (
                 <DropdownMenuItem asChild>
                   <Link href={`/store/${businessSlug}`} target="_blank" rel="noopener noreferrer">

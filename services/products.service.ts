@@ -10,5 +10,8 @@ export const ProductsService = {
     api.patch<Product>(`/products/${id}`, data).then((r) => r.data),
   updateImage: (id: string, form: FormData) =>
     api.patch<Product>(`/products/${id}/image`, form).then((r) => r.data),
+  appendImages: (id: string, form: FormData) =>
+    api.post<Product>(`/products/${id}/images`, form).then((r) => r.data),
+  duplicate: (id: string) => api.post<Product>(`/products/${id}/duplicate`).then((r) => r.data),
   delete: (id: string) => api.delete(`/products/${id}`).then((r) => r.data),
 };

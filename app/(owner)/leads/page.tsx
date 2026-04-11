@@ -6,11 +6,11 @@ import { EmptyState } from "@/components/shared/EmptyState";
 import { LoadingSkeleton } from "@/components/shared/LoadingSkeleton";
 import { SectionError } from "@/components/shared/SectionError";
 import { useLeads } from "@/hooks/useLeads";
+import { normalizeWaMeDigits } from "@/lib/ng-whatsapp-phone";
 import { formatCurrency, formatDate } from "@/lib/utils";
 
 function waHref(phone: string): string {
-  const d = phone.replace(/\D/g, "");
-  return `https://wa.me/${d}`;
+  return `https://wa.me/${normalizeWaMeDigits(phone)}`;
 }
 
 export default function LeadsPage() {

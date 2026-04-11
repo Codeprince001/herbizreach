@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { BrandLogo } from "./BrandLogo";
 import { ThemeToggle } from "./ThemeToggle";
 
 const titles: Record<string, string> = {
@@ -40,13 +41,13 @@ export function TopBar() {
 
   return (
     <header className="sticky top-0 z-40 flex h-14 items-center justify-between gap-3 border-b border-[var(--border-default)] bg-[var(--bg-base)]/95 px-4 backdrop-blur-md md:h-16 md:px-6">
-      <div className="flex min-w-0 flex-1 items-center gap-2">
-        <Link
+      <div className="flex min-w-0 flex-1 items-center gap-2 md:gap-3">
+        <BrandLogo
           href="/dashboard"
-          className="hidden shrink-0 font-[family-name:var(--font-display)] text-lg font-bold text-[var(--brand-primary)] md:inline"
-        >
-          HerBizReach
-        </Link>
+          heightClass="h-9 md:h-10"
+          wordmarkClassName="text-[var(--text-primary)] md:text-xl"
+          className="shrink-0"
+        />
         {pathname !== "/dashboard" ? (
           <span className="min-w-0 flex-1 truncate font-[family-name:var(--font-display)] text-base font-semibold text-[var(--text-primary)] md:hidden">
             {mobileTitle}

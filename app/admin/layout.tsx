@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
+import { BrandLogo } from "@/components/layout/BrandLogo";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/stores/useAuthStore";
@@ -42,9 +43,10 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       <header className="flex h-14 items-center justify-between border-b border-[var(--border-default)] px-4 md:px-8">
         <Link
           href="/admin"
-          className="font-[family-name:var(--font-display)] font-bold text-[var(--brand-primary)]"
+          className="flex min-w-0 items-center gap-2 font-[family-name:var(--font-display)] font-bold text-[var(--brand-primary)]"
         >
-          HerBizReach Admin
+          <BrandLogo heightClass="h-8 md:h-9" wordmarkClassName="text-base md:text-lg text-[var(--brand-primary)]" />
+          <span className="shrink-0 text-[var(--text-secondary)]">Admin</span>
         </Link>
         <div className="flex items-center gap-2">
           <ThemeToggle />

@@ -1,14 +1,15 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, Sparkles, Upload } from "lucide-react";
+import { Loader2, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { type ChangeEvent, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 import { AiSuggestionPanel } from "@/components/product/AiSuggestionPanel";
+import { ProductGalleryEditor } from "@/components/product/ProductGalleryEditor";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -21,13 +22,7 @@ import { PageHeader } from "@/components/shared/PageHeader";
 import { SectionError } from "@/components/shared/SectionError";
 import { useImproveDescription } from "@/hooks/useAi";
 import { useCategories } from "@/hooks/useCategories";
-import {
-  PRODUCTS_KEY,
-  useDeleteProduct,
-  useProduct,
-  useUpdateProduct,
-  useUpdateProductImage,
-} from "@/hooks/useProducts";
+import { PRODUCTS_KEY, useDeleteProduct, useProduct, useUpdateProduct } from "@/hooks/useProducts";
 import { cn } from "@/lib/utils";
 import { ProductsService } from "@/services/products.service";
 import type { Product } from "@/types/product.types";
@@ -51,11 +46,9 @@ export default function EditProductPage() {
   const qc = useQueryClient();
   const { data: product, isLoading, isError, refetch } = useProduct(id);
   const updateProduct = useUpdateProduct(id);
-  const updateImage = useUpdateProductImage(id);
   const deleteProduct = useDeleteProduct();
   const improve = useImproveDescription();
   const { data: categories } = useCategories();
-  const fileRef = useRef<HTMLInputElement>(null);
   const [aiOpen, setAiOpen] = useState(false);
   const [aiResult, setAiResult] = useState({ description_ai: "", caption_ai: "" });
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -147,15 +140,6 @@ export default function EditProductPage() {
     });
   }
 
-  function onPickImage(e: ChangeEvent<HTMLInputElement>) {
-    const f = e.target.files?.[0];
-    if (!f) return;
-    const fd = new FormData();
-    fd.append("image", f);
-    updateImage.mutate(fd);
-    e.target.value = "";
-  }
-
   if (isLoading) {
     return <LoadingSkeleton />;
   }
@@ -179,29 +163,16 @@ export default function EditProductPage() {
       </div>
 
       <form onSubmit={handleSubmit(onSave)} className="space-y-6">
-        <Card className="border-[var(--border-default)]">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-base">Image</CardTitle>
-            <Button
-              type="button"
-              variant="secondary"
-              size="sm"
-              className="min-h-10"
-              onClick={() => fileRef.current?.click()}
-              disabled={updateImage.isPending}
-            >
-              <Upload className="mr-1 size-4" />
-              Change image
-            </Button>
-            <input
-              ref={fileRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={onPickImage}
-            />
-          </CardHeader>
-        </Card>
+        <ProductGalleryEditor
+          productId={id}
+          imageUrls={
+            product.imageUrls?.length
+              ? product.imageUrls
+              : product.imageUrl
+                ? [product.imageUrl]
+                : []
+          }
+        />
 
         <Card className="border-[var(--border-default)]">
           <CardContent className="space-y-4 pt-6">

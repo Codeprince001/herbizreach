@@ -6,6 +6,7 @@ import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { BrandLogo } from "./BrandLogo";
 import { ownerNav, ownerNavExtra } from "./nav-config";
 
 export function OwnerSidebar() {
@@ -20,6 +21,11 @@ export function OwnerSidebar() {
       )}
     >
       <div className="flex flex-1 flex-col gap-1 p-2">
+        {!collapsed ? (
+          <div className="mb-2 border-b border-[var(--border-default)] px-1 pb-3">
+            <BrandLogo href="/dashboard" heightClass="h-9" wordmarkClassName="text-base" />
+          </div>
+        ) : null}
         {[...ownerNav, ...ownerNavExtra].map((item) => {
           const Icon = item.icon;
           const active = pathname === item.href || pathname.startsWith(`${item.href}/`);

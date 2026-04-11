@@ -17,6 +17,7 @@ export interface StoreSettings {
   bannerUrl: string | null;
   accentColor: string | null;
   tagline: string | null;
+  description: string | null;
   showChatWidget: boolean;
 }
 

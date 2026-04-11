@@ -2,10 +2,7 @@
 
 import { MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-function digitsOnly(phone: string): string {
-  return phone.replace(/\D/g, "");
-}
+import { normalizeWaMeDigits } from "@/lib/ng-whatsapp-phone";
 
 export function WhatsAppShareButton(props: {
   phone: string | null | undefined;
@@ -21,7 +18,7 @@ export function WhatsAppShareButton(props: {
       </Button>
     );
   }
-  const href = `https://wa.me/${digitsOnly(phone)}?text=${encodeURIComponent(message)}`;
+  const href = `https://wa.me/${normalizeWaMeDigits(phone)}?text=${encodeURIComponent(message)}`;
   return (
     <Button type="button" asChild className={`min-h-11 ${className ?? ""}`}>
       <a href={href} target="_blank" rel="noopener noreferrer">

@@ -14,6 +14,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { BrandLogo } from "@/components/layout/BrandLogo";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { Sheet, SheetClose, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
@@ -155,9 +156,7 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-[var(--bg-base)] text-[var(--text-primary)]">
       <header className="flex items-center justify-between px-4 py-4 md:px-8">
-        <span className="font-[family-name:var(--font-display)] text-lg font-bold text-[var(--brand-primary)]">
-          HerBizReach
-        </span>
+        <BrandLogo href="/" heightClass="h-9 sm:h-10 md:h-11" priority />
         <div className="md:hidden">
           <Sheet>
             <SheetTrigger asChild>
@@ -166,9 +165,9 @@ export default function LandingPage() {
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="space-y-4 pt-12">
-              <p className="font-[family-name:var(--font-display)] text-lg font-bold text-[var(--brand-primary)]">
-                HerBizReach
-              </p>
+              <div className="inline-flex pb-1">
+                <BrandLogo heightClass="h-8" />
+              </div>
               <div className="space-y-2">
                 <SheetClose asChild>
                   <Button asChild variant="secondary" className="w-full justify-start">
@@ -420,9 +419,7 @@ export default function LandingPage() {
       <footer className="border-t border-[var(--border-default)] bg-[var(--bg-base)] px-4 py-12 md:px-8">
         <div className="mx-auto grid max-w-6xl gap-10 md:grid-cols-4">
           <div className="md:col-span-2">
-            <p className="font-[family-name:var(--font-display)] text-2xl font-extrabold text-[var(--brand-primary)]">
-              HerBizReach
-            </p>
+            <BrandLogo href="/" heightClass="h-11 sm:h-12 md:h-14" wordmarkClassName="text-lg sm:text-xl md:text-2xl" />
             <p className="mt-3 max-w-md text-sm leading-6 text-[var(--text-muted)]">
               The visibility and sales toolkit built for women-led SMEs across Africa. Create your store,
               optimize product copy with AI, and convert buyer interest faster.

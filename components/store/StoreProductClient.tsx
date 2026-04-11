@@ -3,7 +3,7 @@
 import { MessageCircle, Share2, Store } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useLogStoreShare, useLogStoreView } from "@/hooks/useStore";
@@ -39,7 +39,15 @@ export function StoreProductClient(props: {
   const waPhone =
     store.storeSettings?.whatsAppPhone ?? store.business.phone ?? null;
   const waMsg = `Hi! I'm interested in ${product.name} from ${store.business.businessName}.`;
-  const imageSrc = product.imageUrl?.trim() ?? "";
+  const gallery =
+    product.imageUrls?.length ? product.imageUrls : product.imageUrl?.trim() ? [product.imageUrl.trim()] : [];
+  const [activeIdx, setActiveIdx] = useState(0);
+
+  useEffect(() => {
+    setActiveIdx(0);
+  }, [product.id]);
+
+  const imageSrc = gallery[Math.min(activeIdx, Math.max(0, gallery.length - 1))] ?? "";
   const messageSellerHref = `/store/${slug}/chat?product=${encodeURIComponent(product.id)}`;
 
   async function shareProduct() {
@@ -100,25 +108,53 @@ export function StoreProductClient(props: {
 
       <main className="mx-auto max-w-5xl px-4 pb-20 pt-6 md:pb-24 md:pt-10">
         <article className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-start lg:gap-12">
-          <div className="relative mx-auto aspect-[4/5] w-full max-w-lg overflow-hidden rounded-2xl bg-[var(--bg-muted)] shadow-[var(--shadow-md)] ring-1 ring-[var(--border-default)] lg:mx-0 lg:max-w-none lg:aspect-square lg:sticky lg:top-6">
-            {imageSrc ? (
-              <Image
-                src={imageSrc}
-                alt={product.name}
-                fill
-                className="object-cover"
-                priority
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                unoptimized={imageSrc.startsWith("http://localhost")}
-              />
-            ) : (
-              <div className="flex h-full w-full flex-col items-center justify-center gap-2 p-8 text-center">
-                <span className="text-4xl opacity-40" aria-hidden>
-                  📷
-                </span>
-                <p className="text-sm text-[var(--text-muted)]">No photo for this product yet</p>
-              </div>
-            )}
+          <div className="mx-auto w-full max-w-lg space-y-3 lg:mx-0 lg:max-w-none lg:sticky lg:top-6">
+            <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl bg-[var(--bg-muted)] shadow-[var(--shadow-md)] ring-1 ring-[var(--border-default)] lg:aspect-square">
+              {imageSrc ? (
+                <Image
+                  src={imageSrc}
+                  alt={product.name}
+                  fill
+                  className="object-cover"
+                  priority
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  unoptimized={imageSrc.startsWith("http://localhost")}
+                />
+              ) : (
+                <div className="flex h-full w-full flex-col items-center justify-center gap-2 p-8 text-center">
+                  <span className="text-4xl opacity-40" aria-hidden>
+                    📷
+                  </span>
+                  <p className="text-sm text-[var(--text-muted)]">No photo for this product yet</p>
+                </div>
+              )}
+            </div>
+            {gallery.length > 1 ? (
+              <ul className="flex gap-2 overflow-x-auto pb-1" aria-label="Product photos">
+                {gallery.map((url, i) => (
+                  <li key={`${url}-${i}`} className="shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => setActiveIdx(i)}
+                      className={`relative size-16 overflow-hidden rounded-lg ring-2 transition sm:size-20 ${
+                        i === activeIdx ? "ring-[var(--brand-primary)]" : "ring-transparent opacity-80 hover:opacity-100"
+                      }`}
+                      aria-label={`Show photo ${i + 1}`}
+                      aria-current={i === activeIdx}
+                    >
+                      <Image
+                        src={url}
+                        alt=""
+                        fill
+                        className="object-cover"
+                        sizes="80px"
+                        unoptimized={url.startsWith("http://localhost")}
+                      />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
           </div>
 
           <div className="flex min-w-0 flex-col">

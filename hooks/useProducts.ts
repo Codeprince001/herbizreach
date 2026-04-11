@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { ProductsService } from "@/services/products.service";
 import type { UpdateProductDto } from "@/types/product.types";
@@ -55,6 +56,36 @@ export function useUpdateProductImage(id: string) {
       toast.success("Image updated.");
     },
     onError: () => toast.error("Image upload failed."),
+  });
+}
+
+export function useAppendProductImages(id: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (form: FormData) => ProductsService.appendImages(id, form),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: PRODUCTS_KEY });
+      void qc.invalidateQueries({ queryKey: [...PRODUCTS_KEY, id] });
+      toast.success("Photos added.");
+    },
+    onError: () => toast.error("Could not add photos."),
+  });
+}
+
+export function useDuplicateProduct(options?: { navigateToEdit?: boolean }) {
+  const navigateToEdit = options?.navigateToEdit ?? true;
+  const qc = useQueryClient();
+  const router = useRouter();
+  return useMutation({
+    mutationFn: (id: string) => ProductsService.duplicate(id),
+    onSuccess: (data) => {
+      void qc.invalidateQueries({ queryKey: PRODUCTS_KEY });
+      toast.success("Draft copy created — review and publish when ready.");
+      if (navigateToEdit) {
+        router.push(`/products/${data.id}`);
+      }
+    },
+    onError: () => toast.error("Could not duplicate product."),
   });
 }
 

@@ -6,7 +6,9 @@ import type { Product } from "@/types/product.types";
 export function StoreProductCard(props: { product: Product; slug: string }) {
   const { product, slug } = props;
   const desc = product.descriptionAi ?? product.descriptionRaw;
-  const imageSrc = product.imageUrl?.trim() ?? "";
+  const imageSrc =
+    product.imageUrls?.[0]?.trim() || product.imageUrl?.trim() || "";
+  const moreCount = (product.imageUrls?.length ?? 0) > 1 ? product.imageUrls.length - 1 : 0;
   return (
     <Link
       href={`/store/${slug}/products/${product.id}`}
@@ -26,6 +28,11 @@ export function StoreProductCard(props: { product: Product; slug: string }) {
             No photo
           </div>
         )}
+        {moreCount > 0 ? (
+          <span className="absolute bottom-2 right-2 rounded-md bg-black/60 px-1.5 py-0.5 text-[10px] font-semibold text-white backdrop-blur-sm">
+            +{moreCount} photos
+          </span>
+        ) : null}
       </div>
       <div className="p-3 md:p-4">
         <h3 className="font-[family-name:var(--font-display)] font-semibold text-[var(--text-primary)]">

@@ -16,6 +16,9 @@ export interface Product {
   descriptionRaw: string;
   descriptionAi: string | null;
   captionAi: string | null;
+  /** All gallery images (order = display order; first = cover). */
+  imageUrls: string[];
+  /** Same as imageUrls[0]; kept for simple cards and older code paths. */
   imageUrl: string;
   isPublished: boolean;
   createdAt: string;
@@ -34,4 +37,5 @@ export interface UpdateProductDto {
   featured?: boolean;
   categoryIds?: string[];
   isPublished?: boolean;
+  imageUrls?: string[];
 }
