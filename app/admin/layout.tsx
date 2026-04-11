@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
+import { AdminSidebarDesktop, AdminSidebarMobileTrigger } from "@/components/admin/AdminSidebar";
 import { BrandLogo } from "@/components/layout/BrandLogo";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { Button } from "@/components/ui/button";
@@ -39,31 +40,40 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg-base)]">
-      <header className="flex h-14 items-center justify-between border-b border-[var(--border-default)] px-4 md:px-8">
-        <Link
-          href="/admin"
-          className="flex min-w-0 items-center gap-2 font-[family-name:var(--font-display)] font-bold text-[var(--brand-primary)]"
-        >
-          <BrandLogo heightClass="h-8 md:h-9" wordmarkClassName="text-base md:text-lg text-[var(--brand-primary)]" />
-          <span className="shrink-0 text-[var(--text-secondary)]">Admin</span>
-        </Link>
-        <div className="flex items-center gap-2">
-          <ThemeToggle />
-          <Button
-            type="button"
-            variant="secondary"
-            className="min-h-10"
-            onClick={() => {
-              logout();
-              window.location.href = "/login";
-            }}
-          >
-            Log out
-          </Button>
-        </div>
-      </header>
-      <main className="px-4 py-8 md:px-8">{children}</main>
+    <div className="flex min-h-screen bg-[var(--bg-base)]">
+      <AdminSidebarDesktop />
+      <div className="flex min-w-0 flex-1 flex-col">
+        <header className="sticky top-0 z-40 flex h-14 shrink-0 items-center justify-between gap-3 border-b border-[var(--border-default)] bg-[var(--bg-card)]/95 px-4 backdrop-blur-md md:px-6">
+          <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
+            <AdminSidebarMobileTrigger />
+            <Link
+              href="/admin"
+              className="flex min-w-0 items-center gap-2 font-[family-name:var(--font-display)] font-bold text-[var(--brand-primary)]"
+            >
+              <BrandLogo
+                heightClass="h-8 md:h-9"
+                wordmarkClassName="text-base md:text-lg text-[var(--brand-primary)]"
+              />
+              <span className="hidden shrink-0 text-[var(--text-secondary)] sm:inline">Admin</span>
+            </Link>
+          </div>
+          <div className="flex shrink-0 items-center gap-2">
+            <ThemeToggle />
+            <Button
+              type="button"
+              variant="secondary"
+              className="min-h-10"
+              onClick={() => {
+                logout();
+                window.location.href = "/login";
+              }}
+            >
+              Log out
+            </Button>
+          </div>
+        </header>
+        <main className="flex-1 px-4 py-6 md:px-6 md:py-8">{children}</main>
+      </div>
     </div>
   );
 }

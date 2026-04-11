@@ -23,7 +23,11 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="space-y-8">
-      <PageHeader title="Platform overview" description="Aggregate stats across all tenants." />
+      <PageHeader
+        className="!px-0"
+        title="Platform overview"
+        description="Aggregate stats across all tenants."
+      />
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <div className="rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--bg-card)] p-4">
           <p className="text-xs font-medium uppercase text-[var(--text-muted)]">Users</p>
@@ -37,7 +41,7 @@ export default function AdminDashboardPage() {
           <p className="mt-1 text-2xl font-bold text-[var(--text-primary)]">{d.products.total}</p>
           <p className="text-xs text-[var(--text-muted)]">{d.products.published} published</p>
         </div>
-        <div className="rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--bg-card)] p-4">
+        <div className="rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--bg-card)] p-4 sm:col-span-2 lg:col-span-1">
           <p className="text-xs font-medium uppercase text-[var(--text-muted)]">Engagement</p>
           <p className="mt-1 text-sm text-[var(--text-secondary)]">
             {d.engagement.pageViews} views · {d.engagement.shareEvents} shares
