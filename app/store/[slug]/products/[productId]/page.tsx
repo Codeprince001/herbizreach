@@ -1,19 +1,18 @@
 import { notFound } from "next/navigation";
 import { StoreProductClient } from "@/components/store/StoreProductClient";
+import { buildProductPageMetadata } from "@/lib/seo";
 import { fetchPublicProduct, fetchPublicStore } from "@/lib/server-api";
 
 type Props = { params: Promise<{ slug: string; productId: string }> };
 
 export async function generateMetadata({ params }: Props) {
   const { slug, productId } = await params;
-  const product = await fetchPublicProduct(slug, productId);
-  if (!product) return { title: "Product" };
-  const text =
-    product.descriptionAi?.trim() ||
-    product.descriptionRaw?.trim() ||
-    "";
-  const desc = text.slice(0, 160);
-  return { title: `${product.name} | HerBizReach`, description: desc };
+  const [product, store] = await Promise.all([
+    fetchPublicProduct(slug, productId),
+    fetchPublicStore(slug),
+  ]);
+  if (!product || !store) return { title: "Product" };
+  return buildProductPageMetadata(slug, productId, product, store.business.businessName);
 }
 
 export default async function StoreProductPage({ params }: Props) {

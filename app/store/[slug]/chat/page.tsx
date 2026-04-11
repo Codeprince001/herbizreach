@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { StoreGuestChatClient } from "@/components/store/StoreGuestChatClient";
+import { SITE_NAME, buildStorePageMetadata } from "@/lib/seo";
 import { fetchPublicProduct, fetchPublicStore } from "@/lib/server-api";
 
 type Props = {
@@ -11,9 +12,15 @@ export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
   const data = await fetchPublicStore(slug);
   if (!data) return { title: "Chat" };
+  const title = `Message ${data.business.businessName}`;
+  const description = `Chat with ${data.business.businessName} on ${SITE_NAME}.`;
+  const base = buildStorePageMetadata(slug, data);
   return {
-    title: `Message ${data.business.businessName} | HerBizReach`,
-    description: `Chat with ${data.business.businessName} on HerBizReach.`,
+    ...base,
+    title,
+    description,
+    openGraph: { ...base.openGraph, title, description },
+    twitter: { ...base.twitter, title, description },
   };
 }
 
