@@ -36,7 +36,7 @@ export function ProductCard(props: {
             alt={product.name}
             fill
             className="object-cover"
-            sizes="(max-width:640px) 100vw, (max-width:1024px) 45vw, 280px"
+            sizes="(max-width:640px) 50vw, (max-width:1024px) 33vw, 280px"
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center text-xs text-[var(--text-muted)]">
@@ -49,18 +49,23 @@ export function ProductCard(props: {
           </Badge>
         </div>
       </div>
-      <div className="space-y-2 p-4">
-        <h3 className="truncate font-[family-name:var(--font-display)] font-semibold text-[var(--text-primary)]">
+      <div className="space-y-1.5 p-3 sm:space-y-2 sm:p-4">
+        <h3 className="truncate text-sm font-[family-name:var(--font-display)] font-semibold leading-tight text-[var(--text-primary)] sm:text-base">
           {product.name}
         </h3>
-        <p className="text-sm font-medium text-[var(--brand-primary)]">
+        <p className="text-xs font-medium text-[var(--brand-primary)] sm:text-sm">
           {formatCurrency(product.price)}
         </p>
-        <p className="text-xs text-[var(--text-muted)]">{viewCount} views</p>
-        <div className="flex flex-wrap gap-2 pt-1">
-          <Button asChild variant="secondary" size="sm" className="min-h-10 min-w-[5.5rem] flex-1">
-            <Link href={`/products/${product.id}`}>
-              <Pencil className="mr-1 size-4" />
+        <p className="text-[11px] text-[var(--text-muted)] sm:text-xs">{viewCount} views</p>
+        <div className="grid grid-cols-2 gap-1.5 pt-1 sm:flex sm:flex-wrap sm:gap-2">
+          <Button
+            asChild
+            variant="secondary"
+            size="sm"
+            className="min-h-9 min-w-0 flex-1 px-2 text-xs sm:min-h-10 sm:min-w-[5.5rem] sm:px-3 sm:text-sm"
+          >
+            <Link href={`/products/${product.id}`} className="justify-center">
+              <Pencil className="mr-0.5 size-3.5 shrink-0 sm:mr-1 sm:size-4" />
               Edit
             </Link>
           </Button>
@@ -69,10 +74,10 @@ export function ProductCard(props: {
               type="button"
               variant="secondary"
               size="sm"
-              className="min-h-10 min-w-[5.5rem] flex-1"
+              className="min-h-9 min-w-0 flex-1 px-2 text-xs sm:min-h-10 sm:min-w-[5.5rem] sm:px-3 sm:text-sm"
               onClick={onDuplicate}
             >
-              <Copy className="mr-1 size-4" />
+              <Copy className="mr-0.5 size-3.5 shrink-0 sm:mr-1 sm:size-4" />
               Duplicate
             </Button>
           ) : null}
@@ -81,7 +86,7 @@ export function ProductCard(props: {
               type="button"
               variant="destructive"
               size="sm"
-              className="min-h-9 shrink-0 px-2.5 md:min-h-10 md:px-3"
+              className="col-span-2 min-h-9 w-full justify-center px-2.5 sm:col-span-1 sm:w-auto sm:min-h-10 sm:shrink-0 sm:px-3"
               onClick={onDelete}
               aria-label="Delete product"
             >
