@@ -1,8 +1,23 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { Sparkles, X } from "lucide-react";
+import { Copy, Sparkles, X } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+
+async function copyCaption(text: string) {
+  const trimmed = text.trim();
+  if (!trimmed) {
+    toast.message("No caption to copy yet.");
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(trimmed);
+    toast.success("Caption copied");
+  } catch {
+    toast.error("Could not copy to clipboard.");
+  }
+}
 
 export function AiSuggestionPanel(props: {
   open: boolean;
@@ -42,7 +57,21 @@ export function AiSuggestionPanel(props: {
                   <p className="mt-1 text-sm text-[var(--text-primary)]">{descriptionAi}</p>
                 </div>
                 <div>
-                  <p className="text-xs font-medium text-[var(--text-muted)]">Caption</p>
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-xs font-medium text-[var(--text-muted)]">Caption</p>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="size-8 shrink-0 text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+                      onClick={() => void copyCaption(captionAi)}
+                      disabled={!captionAi.trim()}
+                      aria-label="Copy caption"
+                      title="Copy caption"
+                    >
+                      <Copy className="size-4" />
+                    </Button>
+                  </div>
                   <p className="mt-1 text-sm text-[var(--text-primary)]">{captionAi}</p>
                 </div>
                 <div className="flex flex-wrap gap-2">
