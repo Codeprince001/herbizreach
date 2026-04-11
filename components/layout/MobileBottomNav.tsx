@@ -8,7 +8,8 @@ import { ownerNav } from "./nav-config";
 
 export function MobileBottomNav() {
   const pathname = usePathname();
-  const unreadBump = useChatStore((s) => s.unreadBump);
+  const unreadByConversation = useChatStore((s) => s.unreadByConversation);
+  const totalUnread = Object.values(unreadByConversation).reduce((a, b) => a + b, 0);
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-40 flex h-16 items-center justify-center border-t border-[var(--border-default)] bg-[var(--bg-card)] px-2 pb-safe shadow-[var(--shadow-md)] md:hidden">
@@ -16,7 +17,7 @@ export function MobileBottomNav() {
         {ownerNav.map((item) => {
           const Icon = item.icon;
           const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
-          const showDot = item.href === "/chat" && unreadBump > 0;
+          const showDot = item.href === "/chat" && totalUnread > 0;
           return (
             <Link
               key={item.href}
@@ -30,7 +31,7 @@ export function MobileBottomNav() {
               <span>{item.label}</span>
               {showDot ? (
                 <span className="absolute -right-0.5 -top-0.5 flex min-h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[var(--danger)] px-1 text-[10px] font-bold leading-none text-white">
-                  {unreadBump > 9 ? "9+" : unreadBump}
+                  {totalUnread > 99 ? "99+" : totalUnread}
                 </span>
               ) : null}
             </Link>

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { getSocket, resetSocket } from "@/lib/socket";
-import { ChatService } from "@/services/chat.service";
+import { StoreGuestChatService } from "@/services/store-guest-chat.service";
 import type { Message } from "@/types/chat.types";
 import { cn } from "@/lib/utils";
 
@@ -17,11 +17,11 @@ export function ChatWidget(props: { storeSlug: string; storeName: string }) {
   const [guestToken, setGuestToken] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [text, setText] = useState("");
-  const [starting, setStarting] = useState(false);
+  const [opening, setOpening] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const loadMessages = useCallback(async (cid: string, token: string | null) => {
-    const res = await ChatService.listMessages(cid, {
+    const res = await StoreGuestChatService.listMessages(cid, {
       page: 1,
       limit: 100,
       guestToken: token ?? undefined,
@@ -31,7 +31,7 @@ export function ChatWidget(props: { storeSlug: string; storeName: string }) {
 
   useEffect(() => {
     if (!open || !conversationId) return;
-    const socket = getSocket();
+    const socket = getSocket(undefined);
     socket.auth = {};
     socket.connect();
     socket.emit("join", { conversationId, guestToken: guestToken ?? undefined });
@@ -54,26 +54,35 @@ export function ChatWidget(props: { storeSlug: string; storeName: string }) {
     setOpen(true);
     if (conversationId) {
       await loadMessages(conversationId, guestToken);
-      return;
-    }
-    setStarting(true);
-    try {
-      const res = await ChatService.startConversation(storeSlug);
-      setConversationId(res.conversationId);
-      setGuestToken(res.guestToken);
-      await loadMessages(res.conversationId, res.guestToken);
-    } catch {
-      setOpen(false);
-    } finally {
-      setStarting(false);
     }
   }
 
   async function send() {
     const t = text.trim();
-    if (!t || !conversationId) return;
+    if (!t || opening) return;
+
+    if (!conversationId) {
+      setOpening(true);
+      try {
+        const res = await StoreGuestChatService.startConversation(storeSlug);
+        setConversationId(res.conversationId);
+        setGuestToken(res.guestToken);
+        await StoreGuestChatService.sendMessage(res.conversationId, {
+          body: t,
+          guestToken: res.guestToken ?? undefined,
+        });
+        setText("");
+        await loadMessages(res.conversationId, res.guestToken);
+      } catch {
+        setOpen(false);
+      } finally {
+        setOpening(false);
+      }
+      return;
+    }
+
     setText("");
-    const socket = getSocket();
+    const socket = getSocket(undefined);
     if (socket.connected) {
       socket.emit("sendMessage", {
         conversationId,
@@ -81,7 +90,7 @@ export function ChatWidget(props: { storeSlug: string; storeName: string }) {
         guestToken: guestToken ?? undefined,
       });
     } else {
-      await ChatService.sendMessage(conversationId, {
+      await StoreGuestChatService.sendMessage(conversationId, {
         body: t,
         guestToken: guestToken ?? undefined,
       });
@@ -95,7 +104,7 @@ export function ChatWidget(props: { storeSlug: string; storeName: string }) {
         type="button"
         className="fixed bottom-24 right-4 z-50 size-14 rounded-full shadow-[var(--shadow-brand)] md:bottom-8"
         onClick={() => (open ? setOpen(false) : void handleOpen())}
-        disabled={starting}
+        disabled={opening}
         aria-label={open ? "Close chat" : "Open chat"}
       >
         {open ? <X className="size-6" /> : <MessageCircle className="size-6" />}
@@ -118,12 +127,15 @@ export function ChatWidget(props: { storeSlug: string; storeName: string }) {
           </div>
           <ScrollArea className="h-72 px-3 py-2">
             <div className="space-y-2 pr-2">
+              {messages.length === 0 ? (
+                <p className="py-4 text-center text-xs text-[var(--text-muted)]">Send a message to start.</p>
+              ) : null}
               {messages.map((m) => (
                 <div
                   key={m.id}
                   className={cn(
                     "max-w-[85%] rounded-[var(--radius-md)] px-3 py-2 text-sm",
-                    m.senderType === "GUEST"
+                    m.senderType === "GUEST" || m.senderType === "CUSTOMER"
                       ? "ml-auto bg-[var(--brand-primary)] text-[var(--text-inverse)]"
                       : "bg-[var(--bg-muted)] text-[var(--text-primary)]",
                   )}
@@ -140,10 +152,21 @@ export function ChatWidget(props: { storeSlug: string; storeName: string }) {
               onChange={(e) => setText(e.target.value)}
               placeholder="Type a message…"
               className="min-h-11"
-              onKeyDown={(e) => e.key === "Enter" && void send()}
+              disabled={opening}
+              onKeyDown={(e) => e.key === "Enter" && !opening && void send()}
             />
-            <Button type="button" size="icon" className="shrink-0" onClick={() => void send()}>
-              <Send className="size-4" />
+            <Button
+              type="button"
+              size="icon"
+              className="shrink-0"
+              disabled={opening || !text.trim()}
+              onClick={() => void send()}
+            >
+              {opening ? (
+                <span className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+              ) : (
+                <Send className="size-4" />
+              )}
             </Button>
           </div>
         </div>

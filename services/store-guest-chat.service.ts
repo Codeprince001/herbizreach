@@ -1,40 +1,28 @@
-import api from "@/lib/axios";
-import type {
-  Conversation,
-  MessagesPage,
-  StartConversationResponse,
-} from "@/types/chat.types";
+import { publicApi } from "@/lib/public-api";
+import type { MessagesPage, StartConversationResponse } from "@/types/chat.types";
 
-export const ChatService = {
+/** Public-store buyer chat (never sends owner JWT). Logged-in customers keep using `ChatService` from the dashboard. */
+export const StoreGuestChatService = {
   startConversation: (storeSlug: string, opts?: { productId?: string }) =>
-    api
+    publicApi
       .post<StartConversationResponse>("/chat/conversations/start", {
         storeSlug,
         ...(opts?.productId ? { productId: opts.productId } : {}),
       })
       .then((r) => r.data),
 
-  listConversations: () =>
-    api.get<Conversation[]>("/chat/conversations").then((r) => r.data),
-
   listMessages: (
     conversationId: string,
     params: { page?: number; limit?: number; guestToken?: string },
   ) =>
-    api
+    publicApi
       .get<MessagesPage>(`/chat/conversations/${conversationId}/messages`, {
         params,
       })
       .then((r) => r.data),
 
-  sendMessage: (
-    conversationId: string,
-    body: { body: string; guestToken?: string },
-  ) =>
-    api
+  sendMessage: (conversationId: string, body: { body: string; guestToken?: string }) =>
+    publicApi
       .post(`/chat/conversations/${conversationId}/messages`, body)
       .then((r) => r.data),
-
-  archive: (conversationId: string) =>
-    api.patch(`/chat/conversations/${conversationId}/archive`).then((r) => r.data),
 };

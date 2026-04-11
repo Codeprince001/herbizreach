@@ -11,6 +11,12 @@ export interface ChatUserPreview {
 
 export type ConversationStatus = "OPEN" | "ARCHIVED";
 
+/** When the buyer started chat from a product page. */
+export interface ConversationProductSnippet {
+  id: string;
+  name: string;
+}
+
 export interface Conversation {
   id: string;
   storeUserId: string;
@@ -21,6 +27,7 @@ export interface Conversation {
   createdAt: string;
   customer?: ChatUserPreview | null;
   storeOwner?: ChatUserPreview | null;
+  product?: ConversationProductSnippet | null;
 }
 
 export type MessageSenderType = "OWNER" | "CUSTOMER" | "GUEST" | "SYSTEM";

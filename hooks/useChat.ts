@@ -59,6 +59,9 @@ export function useArchiveConversation() {
 
 export function useStartConversation() {
   return useMutation({
-    mutationFn: (storeSlug: string) => ChatService.startConversation(storeSlug),
+    mutationFn: (vars: { storeSlug: string; productId?: string }) =>
+      ChatService.startConversation(vars.storeSlug, {
+        productId: vars.productId,
+      }),
   });
 }

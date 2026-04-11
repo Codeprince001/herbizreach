@@ -17,8 +17,12 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="space-y-4">
-      <PageHeader title="Messages" description="Chat with customers in real time." />
+    <div className="flex flex-col md:space-y-4">
+      <PageHeader
+        className="hidden md:block"
+        title="Messages"
+        description="Chat with customers in real time."
+      />
       <ChatInbox conversations={data ?? []} loading={false} />
     </div>
   );

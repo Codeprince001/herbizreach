@@ -26,6 +26,25 @@ export function formatDate(iso: string | Date): string {
   });
 }
 
+/** Short labels for chat conversation rows (today / yesterday / weekday / date). */
+export function formatChatListTime(iso: string | null): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  const now = new Date();
+  const startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  const startMsg = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  const diffDays = Math.round((startToday - startMsg) / 86400000);
+  if (diffDays === 0) {
+    return d.toLocaleTimeString("en-NG", { hour: "numeric", minute: "2-digit" });
+  }
+  if (diffDays === 1) return "Yesterday";
+  if (diffDays > 1 && diffDays < 7) {
+    return d.toLocaleDateString("en-NG", { weekday: "short" });
+  }
+  return d.toLocaleDateString("en-NG", { month: "short", day: "numeric" });
+}
+
 export function firstName(fullName: string): string {
   return fullName.trim().split(/\s+/)[0] ?? "there";
 }

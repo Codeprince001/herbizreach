@@ -1,12 +1,11 @@
 "use client";
 
-import { Share2, Store } from "lucide-react";
+import { MessageCircle, Share2, Store } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { ChatWidget } from "@/components/chat/ChatWidget";
 import { useLogStoreShare, useLogStoreView } from "@/hooks/useStore";
 import { resetSocket } from "@/lib/socket";
 import { formatCurrency } from "@/lib/utils";
@@ -41,6 +40,7 @@ export function StoreProductClient(props: {
     store.storeSettings?.whatsAppPhone ?? store.business.phone ?? null;
   const waMsg = `Hi! I'm interested in ${product.name} from ${store.business.businessName}.`;
   const imageSrc = product.imageUrl?.trim() ?? "";
+  const messageSellerHref = `/store/${slug}/chat?product=${encodeURIComponent(product.id)}`;
 
   async function shareProduct() {
     const url =
@@ -169,6 +169,16 @@ export function StoreProductClient(props: {
                 className="min-h-12 flex-1 sm:min-w-[200px] sm:flex-none"
               />
               <Button
+                asChild
+                variant="secondary"
+                className="min-h-12 flex-1 border-[var(--brand-primary)]/35 bg-[var(--brand-glow)] text-[var(--brand-primary)] hover:bg-[var(--brand-primary)]/15 sm:min-w-[180px] sm:flex-none"
+              >
+                <Link href={messageSellerHref}>
+                  <MessageCircle className="mr-2 size-4" />
+                  Message seller
+                </Link>
+              </Button>
+              <Button
                 type="button"
                 variant="secondary"
                 className="min-h-12 flex-1 sm:min-w-[160px] sm:flex-none"
@@ -184,10 +194,6 @@ export function StoreProductClient(props: {
           </div>
         </article>
       </main>
-
-      {store.storeSettings?.showChatWidget !== false ? (
-        <ChatWidget storeSlug={slug} storeName={store.business.businessName} />
-      ) : null}
     </div>
   );
 }

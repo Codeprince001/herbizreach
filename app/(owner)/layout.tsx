@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
 import { OwnerSidebar } from "@/components/layout/OwnerSidebar";
 import { TopBar } from "@/components/layout/TopBar";
+import { useOwnerInboxSocket } from "@/hooks/useOwnerInboxSocket";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { cn } from "@/lib/utils";
 
@@ -44,12 +45,19 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
   return <OwnerShell>{children}</OwnerShell>;
 }
 
+function OwnerInboxSocketBridge() {
+  useOwnerInboxSocket();
+  return null;
+}
+
 function OwnerShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const hideMobileTopBar = pathname === "/dashboard";
+  const isChat = pathname === "/chat";
 
   return (
     <div className="min-h-screen bg-[var(--bg-base)] pb-20 md:pb-0 md:pl-60">
+      <OwnerInboxSocketBridge />
       <OwnerSidebar />
       <div className={cn(hideMobileTopBar && "hidden md:block")}>
         <TopBar />
@@ -58,6 +66,7 @@ function OwnerShell({ children }: { children: React.ReactNode }) {
         className={cn(
           "px-4 py-6 md:ml-0 md:px-8 md:py-8",
           hideMobileTopBar && "pt-0 md:pt-8",
+          isChat && "px-0 py-0 md:px-8 md:py-8",
         )}
       >
         {children}

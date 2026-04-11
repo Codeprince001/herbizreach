@@ -8,7 +8,6 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useLogStoreShare, useLogStoreView } from "@/hooks/useStore";
 import type { PublicStorePayload } from "@/types/store.types";
-import { ChatWidget } from "@/components/chat/ChatWidget";
 import { StoreProductCard } from "./StoreProductCard";
 import { WhatsAppShareButton } from "./WhatsAppShareButton";
 
@@ -122,10 +121,6 @@ export function StorePublicView(props: { initial: PublicStorePayload }) {
           </div>
         )}
       </main>
-
-      {initial.storeSettings?.showChatWidget !== false ? (
-        <ChatWidget storeSlug={slug} storeName={initial.business.businessName} />
-      ) : null}
     </div>
   );
 }
