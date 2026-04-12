@@ -79,3 +79,39 @@ export interface AdminConversationRow {
   } | null;
   customer?: { id: string; fullName: string; email: string | null } | null;
 }
+
+export interface AdminMetricsDailyPoint {
+  date: string;
+  pageViews: number;
+  signups: number;
+  newProducts: number;
+  messages: number;
+  shares: number;
+}
+
+/** Response from GET /admin/metrics (extended with trends for dashboard). */
+export interface AdminMetricsPayload {
+  users: { total: number; owners: number; customers: number; admins: number };
+  products: {
+    total: number;
+    published: number;
+    unpublished: number;
+    featured: number;
+  };
+  engagement: {
+    pageViews: number;
+    shareEvents: number;
+    conversations: number;
+    leads: number;
+    openConversations: number;
+    messagesTotal: number;
+  };
+  activity: {
+    auditLogsTotal: number;
+    newUsers7d: number;
+    newUsers30d: number;
+    newProducts7d: number;
+    newLeads30d: number;
+  };
+  seriesLast14Days: AdminMetricsDailyPoint[];
+}
