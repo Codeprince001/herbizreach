@@ -1,0 +1,20 @@
+# Run from: C:\Users\Windows\Documents\herbizreach\frontend
+# Each block: stage related files, then commit with its own message.
+
+git add "package.json" "package-lock.json"; git commit -m "chore(deps): add @tanstack/react-table for admin data grids"
+
+git add "types/admin.types.ts"; git commit -m "feat(types): add admin API types for users, products, audit, and conversations"
+
+git add "components/ui/dialog.tsx"; git commit -m "feat(ui): add Dialog component (Radix) for admin forms"
+
+git add "components/admin/AdminDataTable.tsx" "components/admin/AdminPagination.tsx" "components/admin/AdminSidebar.tsx"; git commit -m "feat(admin): add responsive sidebar, TanStack table wrapper, and pagination"
+
+git add "services/admin.service.ts" "hooks/useAdmin.ts"; git commit -m "feat(admin): extend admin API client and React Query hooks"
+
+git add "app/admin/layout.tsx" "app/admin/admin-layout-client.tsx" "app/admin/page.tsx" "app/admin/users/page.tsx" "app/admin/products/page.tsx" "app/admin/conversations/page.tsx" "app/admin/audit/page.tsx"; git commit -m "feat(admin): implement admin console pages (overview, users, products, chats, audit)"
+
+git add "lib/seo.ts" "components/seo/WebSiteJsonLd.tsx" "app/robots.ts" "app/sitemap.ts"; git commit -m "feat(seo): add robots.txt, sitemap, JSON-LD helper, and SEO utilities"
+
+git add "app/layout.tsx" "app/(auth)/layout.tsx" "app/(owner)/layout.tsx" "app/(owner)/owner-layout-client.tsx"; git commit -m "refactor(layout): split client shells and adjust root, auth, and owner layouts"
+
+git add "app/store/[slug]/page.tsx" "app/store/[slug]/chat/page.tsx" "app/store/[slug]/products/[productId]/page.tsx"; git commit -m "feat(store): update storefront, chat, and product pages"
