@@ -3,6 +3,7 @@
 import { Share2 } from "lucide-react";
 import Image from "next/image";
 import { useEffect } from "react";
+import { DEFAULT_OG_IMAGE_PATH } from "@/lib/seo";
 import { resetSocket } from "@/lib/socket";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -81,7 +82,28 @@ export function StorePublicView(props: { initial: PublicStorePayload }) {
         ) : null}
         <div className="mx-auto max-w-5xl px-4 py-8 md:py-10">
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-            <div>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+              <div className="relative mx-auto size-20 shrink-0 overflow-hidden rounded-2xl border border-[var(--border-default)] bg-[var(--bg-card)] shadow-sm ring-1 ring-black/5 dark:ring-white/10 sm:mx-0 md:size-24">
+                {initial.storeSettings?.profileImageUrl ? (
+                  <Image
+                    src={initial.storeSettings.profileImageUrl}
+                    alt=""
+                    fill
+                    className="object-cover"
+                    priority
+                    unoptimized
+                  />
+                ) : (
+                  <Image
+                    src={DEFAULT_OG_IMAGE_PATH}
+                    alt=""
+                    fill
+                    className="object-contain p-2.5"
+                    priority
+                  />
+                )}
+              </div>
+              <div className="min-w-0 flex-1 text-center sm:text-left">
               <h1 className="font-[family-name:var(--font-display)] text-3xl font-bold text-[var(--text-primary)] md:text-4xl">
                 {initial.business.businessName}
               </h1>
@@ -95,6 +117,7 @@ export function StorePublicView(props: { initial: PublicStorePayload }) {
                   {initial.storeSettings.description}
                 </p>
               ) : null}
+              </div>
             </div>
             <div className="flex flex-wrap gap-2">
               <WhatsAppShareButton phone={waPhone} message={waMsg} />
