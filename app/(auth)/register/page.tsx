@@ -18,7 +18,7 @@ const schema = z.object({
   email: z.string().email("Enter a valid email"),
   password: z.string().min(8, "At least 8 characters"),
   businessName: z.string().min(2, "Business name required"),
-  phone: z.string().optional(),
+  phone: z.string().trim().min(1, "Phone is required"),
 });
 
 type Form = z.infer<typeof schema>;
@@ -50,7 +50,7 @@ export default function RegisterPage() {
                 email: data.email,
                 password: data.password,
                 businessName: data.businessName,
-                phone: data.phone?.trim() || undefined,
+                phone: data.phone.trim(),
               }),
             )}
           >
@@ -118,8 +118,14 @@ export default function RegisterPage() {
               ) : null}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="phone">Phone (optional)</Label>
-              <Input id="phone" type="tel" {...register("phone")} />
+              <Label htmlFor="phone">Phone</Label>
+              <Input
+                id="phone"
+                type="tel"
+                className={cn(errors.phone && "border-[var(--danger)] ring-1 ring-[var(--danger)]")}
+                {...register("phone")}
+              />
+              {errors.phone ? <p className="text-xs text-[var(--danger)]">{errors.phone.message}</p> : null}
             </div>
             <Button type="submit" className="min-h-11 w-full" disabled={registerOwner.isPending}>
               {registerOwner.isPending ? "Creating…" : "Create my store"}
