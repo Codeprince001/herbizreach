@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
+import { AdminShellSkeleton } from "@/components/admin/AdminSkeletons";
 import { AdminSidebarDesktop, AdminSidebarMobileTrigger } from "@/components/admin/AdminSidebar";
 import { BrandLogo } from "@/components/layout/BrandLogo";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
@@ -31,7 +32,11 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     }
   }, [mounted, token, role, router]);
 
-  if (!mounted || !token || role !== "ADMIN") {
+  if (!mounted) {
+    return <AdminShellSkeleton />;
+  }
+
+  if (!token || role !== "ADMIN") {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[var(--bg-base)]">
         <div className="size-10 animate-spin rounded-full border-2 border-[var(--brand-primary)] border-t-transparent" />

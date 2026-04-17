@@ -16,8 +16,11 @@ import type {
 } from "@/types/admin.types";
 import type { UserRole } from "@/types/auth.types";
 import type { AdminConversationRow } from "@/types/admin.types";
+import { ACTIVE_LOCALES_KEY } from "@/hooks/useLocales";
 
 export const ADMIN_METRICS_KEY = ["admin", "metrics"] as const;
+
+export const ADMIN_LOCALES_KEY = ["admin", "locales"] as const;
 
 export const ADMIN_CATEGORIES_KEY = ["admin", "categories"] as const;
 
@@ -191,5 +194,24 @@ export function useAdminAuditLogs(
     queryKey: adminAuditKey(params),
     queryFn: () => AdminService.listAuditLogs(params),
     ...options,
+  });
+}
+
+export function useAdminLocales() {
+  return useQuery({
+    queryKey: ADMIN_LOCALES_KEY,
+    queryFn: () => AdminService.listLocales(),
+  });
+}
+
+export function usePatchAdminLocale() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ code, isEnabled }: { code: string; isEnabled: boolean }) =>
+      AdminService.patchLocale(code, isEnabled),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ADMIN_LOCALES_KEY });
+      void qc.invalidateQueries({ queryKey: ACTIVE_LOCALES_KEY });
+    },
   });
 }

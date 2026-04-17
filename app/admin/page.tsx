@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { AdminOverviewCharts } from "@/components/admin/AdminOverviewCharts";
+import { AdminDashboardSkeleton } from "@/components/admin/AdminSkeletons";
 import { PageHeader } from "@/components/shared/PageHeader";
-import { LoadingSkeleton } from "@/components/shared/LoadingSkeleton";
 import { SectionError } from "@/components/shared/SectionError";
 import { useAdminMetrics } from "@/hooks/useAdmin";
 import type { AdminMetricsPayload } from "@/types/admin.types";
@@ -58,7 +58,7 @@ export default function AdminDashboardPage() {
   const { data: raw, isLoading, isError, refetch } = useAdminMetrics();
 
   if (isLoading) {
-    return <LoadingSkeleton />;
+    return <AdminDashboardSkeleton />;
   }
 
   const data = normalizeMetrics(raw);

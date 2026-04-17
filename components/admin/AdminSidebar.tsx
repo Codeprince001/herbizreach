@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   ClipboardList,
+  Languages,
   LayoutDashboard,
   Menu,
   MessageSquare,
@@ -22,6 +23,7 @@ const NAV = [
   { href: "/admin/users", label: "Users", icon: Users, exact: false },
   { href: "/admin/products", label: "Products", icon: Package, exact: false },
   { href: "/admin/categories", label: "Categories", icon: Tags, exact: false },
+  { href: "/admin/locales", label: "Languages", icon: Languages, exact: false },
   { href: "/admin/conversations", label: "Chats", icon: MessageSquare, exact: false },
   { href: "/admin/audit", label: "Audit log", icon: ScrollText, exact: false },
 ] as const;

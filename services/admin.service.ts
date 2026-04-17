@@ -75,4 +75,28 @@ export const AdminService = {
     actorUserId?: string;
     entityType?: string;
   }) => api.get<Paginated<AuditLogEntry>>("/admin/audit-logs", { params }).then((r) => r.data),
+
+  listLocales: () =>
+    api
+      .get<
+        {
+          code: string;
+          labelEnglish: string;
+          labelNative: string;
+          isEnabled: boolean;
+          sortOrder: number;
+        }[]
+      >("/admin/locales")
+      .then((r) => r.data),
+
+  patchLocale: (code: string, isEnabled: boolean) =>
+    api
+      .patch<{
+        code: string;
+        labelEnglish: string;
+        labelNative: string;
+        isEnabled: boolean;
+        sortOrder: number;
+      }>(`/admin/locales/${encodeURIComponent(code)}`, { isEnabled })
+      .then((r) => r.data),
 };
