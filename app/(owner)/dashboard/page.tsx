@@ -2,7 +2,6 @@
 
 import {
   ArrowUpRight,
-  Bell,
   Copy,
   Eye,
   Link2,
@@ -25,8 +24,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { EngagementChart } from "@/components/analytics/EngagementChart";
-import { DashboardLoadingState } from "@/components/dashboard/DashboardLoadingState";
+import { DashboardSkeleton } from "@/components/dashboard/DashboardSkeleton";
 import { BrandLogo } from "@/components/layout/BrandLogo";
+import { NotificationNavLink } from "@/components/layout/NotificationNavLink";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { SectionError } from "@/components/shared/SectionError";
 import { useAnalyticsOverview } from "@/hooks/useAnalytics";
@@ -133,15 +133,10 @@ function DashboardMobileHeader() {
         linkClassName="text-white"
       />
       <div className="flex items-center gap-1">
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          className="text-white hover:bg-white/10"
-          aria-label="Notification"
-        >
-          <Bell className="size-5" />
-        </Button>
+        <NotificationNavLink
+          className="text-white hover:bg-white/10 hover:text-white"
+          iconClassName="text-white"
+        />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
@@ -226,7 +221,7 @@ export default function DashboardPage() {
   );
 
   if (isLoading) {
-    return <DashboardLoadingState message="Fetching your latest store performance and product updates." />;
+    return <DashboardSkeleton />;
   }
 
   if (isError || !data) {

@@ -1,5 +1,5 @@
-import { DashboardLoadingState } from "@/components/dashboard/DashboardLoadingState";
+import { DashboardSkeleton } from "@/components/dashboard/DashboardSkeleton";
 
 export default function DashboardLoading() {
-  return <DashboardLoadingState message="Preparing your business insights and latest activity." />;
+  return <DashboardSkeleton />;
 }
