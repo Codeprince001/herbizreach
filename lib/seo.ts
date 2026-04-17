@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { storefrontProductDescription, storefrontProductName } from "@/lib/storefront-product";
 import type { Product } from "@/types/product.types";
 import type { PublicStorePayload } from "@/types/store.types";
 
@@ -48,8 +49,13 @@ function storeDescription(data: PublicStorePayload): string {
   return `Shop ${data.business.businessName} on ${SITE_NAME}.`;
 }
 
-export function buildStorePageMetadata(slug: string, data: PublicStorePayload): Metadata {
-  const url = absolutizeUrl(`/store/${slug}`);
+export function buildStorePageMetadata(
+  slug: string,
+  data: PublicStorePayload,
+  locale?: string | null,
+): Metadata {
+  const q = locale?.trim() ? `?locale=${encodeURIComponent(locale.trim())}` : "";
+  const url = absolutizeUrl(`/store/${slug}${q}`);
   const title = data.business.businessName;
   const description = storeDescription(data);
   const profile = data.storeSettings?.profileImageUrl?.trim();
@@ -87,18 +93,15 @@ export function buildProductPageMetadata(
   productId: string,
   product: Product,
   storeName: string,
+  locale?: string | null,
 ): Metadata {
-  const url = absolutizeUrl(`/store/${slug}/products/${productId}`);
-  const raw =
-    product.descriptionAi?.trim() ||
-    product.descriptionRaw?.trim() ||
-    product.captionAi?.trim() ||
-    "";
-  const description = (raw || `Buy ${product.name} from ${storeName} on ${SITE_NAME}.`).slice(
-    0,
-    200,
-  );
-  const title = `${product.name} · ${storeName}`;
+  const q = locale?.trim() ? `?locale=${encodeURIComponent(locale.trim())}` : "";
+  const url = absolutizeUrl(`/store/${slug}/products/${productId}${q}`);
+  const pname = storefrontProductName(product);
+  const body = storefrontProductDescription(product);
+  const raw = body || product.captionAi?.trim() || "";
+  const description = (raw || `Buy ${pname} from ${storeName} on ${SITE_NAME}.`).slice(0, 200);
+  const title = `${pname} · ${storeName}`;
   const cover = product.imageUrls?.[0]?.trim() || product.imageUrl?.trim() || null;
   const image = ogImageUrl(cover);
 
@@ -113,7 +116,7 @@ export function buildProductPageMetadata(
       title,
       description,
       locale: "en_NG",
-      images: [{ url: image, alt: product.name }],
+      images: [{ url: image, alt: pname }],
     },
     twitter: {
       card: "summary_large_image",

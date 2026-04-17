@@ -265,7 +265,7 @@ export default function LandingPage() {
               Your Business, Seen by More
             </h1>
             <p className="mt-4 text-lg text-[var(--text-secondary)]">
-              Built for growing SMEs across Africa, w one shareable storefront, sharper product copy
+              Built for growing SMEs across Africa, with one shareable storefront, sharper product copy
               with AI, and WhatsApp-ready conversations so more buyers find you and check out faster.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center lg:justify-start">
