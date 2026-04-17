@@ -1,4 +1,12 @@
 import { NextResponse } from "next/server";
+import { fetchPublicStore } from "@/lib/server-api";
+
+function absoluteFromRequest(origin: string, pathOrUrl: string): string {
+  const raw = pathOrUrl.trim();
+  if (raw.startsWith("http://") || raw.startsWith("https://")) return raw;
+  const path = raw.startsWith("/") ? raw : `/${raw}`;
+  return `${origin}${path}`;
+}
 
 export async function GET(
   request: Request,
@@ -6,25 +14,33 @@ export async function GET(
 ) {
   const { slug } = await context.params;
   const origin = new URL(request.url).origin;
+  const store = await fetchPublicStore(slug);
+  const profile = store?.storeSettings?.profileImageUrl?.trim();
+  const iconSrc = profile
+    ? absoluteFromRequest(origin, profile)
+    : `${origin}/herbizreach-logo.png`;
+  const displayName = store?.business.businessName ?? slug;
 
   const manifest = {
     id: `herbizreach-store-${slug}`,
-    name: `HerBizReach — ${slug}`,
-    short_name: slug.length > 14 ? `${slug.slice(0, 12)}…` : slug,
-    description: "Shop this store on HerBizReach",
+    name: `${displayName} · HerBizReach`,
+    short_name: displayName.length > 16 ? `${displayName.slice(0, 14)}…` : displayName,
+    description: store?.storeSettings?.tagline?.trim() || "Shop this store on HerBizReach",
     start_url: `/store/${slug}`,
     scope: `/store/${slug}/`,
     display: "standalone" as const,
     orientation: "portrait-primary" as const,
     background_color: "#faf5ff",
-    theme_color: "#7c3aed",
+    theme_color: store?.storeSettings?.accentColor?.trim() || "#7c3aed",
     icons: [
-      {
-        src: `${origin}/herbizreach-logo.png`,
-        sizes: "any",
-        type: "image/png",
-        purpose: "any",
-      },
+      profile
+        ? { src: iconSrc, sizes: "512x512", purpose: "any" as const }
+        : {
+            src: iconSrc,
+            sizes: "512x512",
+            type: "image/png",
+            purpose: "any" as const,
+          },
     ],
   };
 
