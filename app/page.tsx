@@ -8,8 +8,11 @@ import {
   Link2,
   Menu,
   MessageCircle,
+  PackagePlus,
+  Share2,
   Sparkles,
   Star,
+  UserPlus,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -74,6 +77,33 @@ const features = [
       "Each product can open a pre-filled WhatsApp message so customers ask fewer vague questions and move faster toward a purchase.",
   },
 ];
+
+const howItWorksSteps = [
+  {
+    step: 1,
+    icon: UserPlus,
+    title: "Sign up",
+    text: "Create your account in a few taps. No technical setup—just your business details and you are in.",
+  },
+  {
+    step: 2,
+    icon: PackagePlus,
+    title: "Add your products",
+    text: "List what you sell with photos, prices, and quick notes in your own voice.",
+  },
+  {
+    step: 3,
+    icon: Sparkles,
+    title: "Polish with AI",
+    text: "Turn rough notes into clear, professional descriptions that read human and sell faster.",
+  },
+  {
+    step: 4,
+    icon: Share2,
+    title: "Share your link & WhatsApp",
+    text: "Drop your storefront link in your bio or status. Buyers tap through and message you on WhatsApp with context.",
+  },
+] as const;
 
 const testimonials = [
   {
@@ -235,8 +265,8 @@ export default function LandingPage() {
               Your Business, Seen by More
             </h1>
             <p className="mt-4 text-lg text-[var(--text-secondary)]">
-              Built for bold women-led SMEs across Africa — share your catalog, glow up your copy with
-              AI, and meet customers on WhatsApp.
+              Built for growing SMEs across Africa, w one shareable storefront, sharper product copy
+              with AI, and WhatsApp-ready conversations so more buyers find you and check out faster.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center lg:justify-start">
               <Button asChild className="min-h-12 px-8 text-base">
@@ -306,12 +336,55 @@ export default function LandingPage() {
         </div>
       </section>
 
+      <section className="border-t border-[var(--border-default)] px-4 py-16 md:px-8 md:py-20">
+        <div className="mx-auto max-w-5xl">
+          <div className="mb-10 text-center md:mb-12">
+            <h2 className="font-[family-name:var(--font-display)] text-2xl font-bold tracking-tight text-[var(--text-primary)] md:text-3xl">
+              How it works
+            </h2>
+            <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-[var(--text-muted)] md:text-base">
+              From first login to your first buyer message—four simple steps, all from your phone.
+            </p>
+          </div>
+          <ol className="grid list-none grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
+            {howItWorksSteps.map((item, i) => {
+              const Icon = item.icon;
+              return (
+                <motion.li
+                  key={item.step}
+                  initial={{ opacity: 0, y: 12 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.05, duration: 0.2 }}
+                  className="relative flex flex-col rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--bg-card)] p-6 shadow-[var(--shadow-sm)]"
+                >
+                  <span
+                    className="absolute -top-3 left-6 inline-flex h-7 min-w-7 items-center justify-center rounded-full border border-[var(--border-default)] bg-[var(--bg-subtle)] px-2 font-[family-name:var(--font-display)] text-xs font-bold text-[var(--brand-primary)]"
+                    aria-hidden
+                  >
+                    {item.step}
+                  </span>
+                  <div className="mt-2 flex size-11 items-center justify-center rounded-[var(--radius-md)] bg-[var(--brand-glow)] text-[var(--brand-primary)]">
+                    <Icon className="size-5" aria-hidden />
+                  </div>
+                  <h3 className="mt-4 font-[family-name:var(--font-display)] font-bold text-[var(--text-primary)]">
+                    <span className="sr-only">Step {item.step}: </span>
+                    {item.title}
+                  </h3>
+                  <p className="mt-2 text-sm leading-6 text-[var(--text-muted)]">{item.text}</p>
+                </motion.li>
+              );
+            })}
+          </ol>
+        </div>
+      </section>
+
       <section className="px-4 py-20 md:px-8 md:py-24">
         <h2 className="text-center font-[family-name:var(--font-display)] text-3xl font-bold tracking-tight text-[var(--text-primary)] md:text-4xl">
           What founders say
         </h2>
         <p className="mx-auto mt-4 max-w-2xl text-center text-base leading-relaxed text-[var(--text-muted)] md:text-lg">
-          Real stories from women entrepreneurs using HerBizReach to grow visibility, simplify selling, and
+          Real stories from founders and teams using HerBizReach to grow visibility, simplify selling, and
           convert more chats into orders.
         </p>
 
@@ -421,8 +494,8 @@ export default function LandingPage() {
           <div className="md:col-span-2">
             <BrandLogo href="/" heightClass="h-11 sm:h-12 md:h-14" wordmarkClassName="text-lg sm:text-xl md:text-2xl" />
             <p className="mt-3 max-w-md text-sm leading-6 text-[var(--text-muted)]">
-              The visibility and sales toolkit built for women-led SMEs across Africa. Create your store,
-              optimize product copy with AI, and convert buyer interest faster.
+              The visibility and sales toolkit for SMEs across Africa. Create your store, refine product
+              copy with AI, and turn buyer interest into orders faster.
             </p>
             <div className="mt-5 flex gap-3">
               <Button asChild className="min-h-11">
@@ -464,7 +537,7 @@ export default function LandingPage() {
         </div>
         <div className="mx-auto mt-10 flex max-w-6xl flex-col gap-3 border-t border-[var(--border-default)] pt-6 text-xs text-[var(--text-muted)] md:flex-row md:items-center md:justify-between">
           <span>© {new Date().getFullYear()} HerBizReach. All rights reserved.</span>
-          <span>Made for Women in Tech Hackathon 2026</span>
+          <span>Originated at the Women in Tech Hackathon 2026</span>
         </div>
       </footer>
     </div>
