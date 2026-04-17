@@ -2,7 +2,7 @@
 
 import { ArrowLeft, ExternalLink, Send } from "lucide-react";
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,12 @@ import { StoreGuestChatService } from "@/services/store-guest-chat.service";
 import { getSocket, resetSocket } from "@/lib/socket";
 import type { Message } from "@/types/chat.types";
 import { cn } from "@/lib/utils";
+import {
+  clearGuestChatSession,
+  guestChatStorageKey,
+  readGuestChatSession,
+  writeGuestChatSession,
+} from "@/lib/guest-chat-storage";
 
 type ProductSummary = { id: string; name: string } | null;
 
@@ -35,6 +41,10 @@ export function StoreGuestChatClient(props: {
   product: ProductSummary;
 }) {
   const { slug, storeName, accent, chatEnabled, product } = props;
+  const storageKey = useMemo(
+    () => guestChatStorageKey(slug, product?.id ?? null),
+    [slug, product?.id],
+  );
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [guestToken, setGuestToken] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -51,6 +61,31 @@ export function StoreGuestChatClient(props: {
     });
     setMessages(res.items);
   }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    const saved = readGuestChatSession(storageKey);
+    if (!saved) return;
+    void (async () => {
+      try {
+        await loadMessages(saved.conversationId, saved.guestToken);
+        if (cancelled) return;
+        setConversationId(saved.conversationId);
+        setGuestToken(saved.guestToken);
+      } catch {
+        clearGuestChatSession(storageKey);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [storageKey, loadMessages]);
+
+  useEffect(() => {
+    if (conversationId && guestToken) {
+      writeGuestChatSession(storageKey, { conversationId, guestToken });
+    }
+  }, [conversationId, guestToken, storageKey]);
 
   useEffect(() => {
     if (!conversationId) return;
