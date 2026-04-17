@@ -1,7 +1,7 @@
 "use client";
 
 import { MessageCircle, Send, X } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -9,9 +9,15 @@ import { getSocket, resetSocket } from "@/lib/socket";
 import { StoreGuestChatService } from "@/services/store-guest-chat.service";
 import type { Message } from "@/types/chat.types";
 import { cn } from "@/lib/utils";
+import {
+  guestChatStorageKey,
+  readGuestChatSession,
+  writeGuestChatSession,
+} from "@/lib/guest-chat-storage";
 
 export function ChatWidget(props: { storeSlug: string; storeName: string }) {
   const { storeSlug, storeName } = props;
+  const storageKey = useMemo(() => guestChatStorageKey(storeSlug), [storeSlug]);
   const [open, setOpen] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [guestToken, setGuestToken] = useState<string | null>(null);
@@ -28,6 +34,20 @@ export function ChatWidget(props: { storeSlug: string; storeName: string }) {
     });
     setMessages(res.items);
   }, []);
+
+  useEffect(() => {
+    const saved = readGuestChatSession(storageKey);
+    if (saved) {
+      setConversationId(saved.conversationId);
+      setGuestToken(saved.guestToken);
+    }
+  }, [storageKey]);
+
+  useEffect(() => {
+    if (conversationId && guestToken) {
+      writeGuestChatSession(storageKey, { conversationId, guestToken });
+    }
+  }, [conversationId, guestToken, storageKey]);
 
   useEffect(() => {
     if (!open || !conversationId) return;
