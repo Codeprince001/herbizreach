@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { AdminOverviewCharts } from "@/components/admin/AdminOverviewCharts";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { LoadingSkeleton } from "@/components/shared/LoadingSkeleton";
@@ -43,6 +44,12 @@ function normalizeMetrics(raw: unknown): AdminMetricsPayload | null {
       newProducts7d: d.activity?.newProducts7d ?? 0,
       newLeads30d: d.activity?.newLeads30d ?? 0,
     },
+    categories: d.categories
+      ? {
+          total: d.categories.total ?? 0,
+          newLast7Days: d.categories.newLast7Days ?? 0,
+        }
+      : { total: 0, newLast7Days: 0 },
     seriesLast14Days: Array.isArray(d.seriesLast14Days) ? d.seriesLast14Days : [],
   };
 }
@@ -67,7 +74,7 @@ export default function AdminDashboardPage() {
         description="Aggregate stats, trends, and health signals across all tenants."
       />
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--bg-card)] p-4">
           <p className="text-xs font-medium uppercase text-[var(--text-muted)]">Users</p>
           <p className="mt-1 text-2xl font-bold text-[var(--text-primary)]">{data.users.total}</p>
@@ -83,7 +90,7 @@ export default function AdminDashboardPage() {
           </p>
           <p className="text-xs text-[var(--text-muted)]">{data.products.featured} featured</p>
         </div>
-        <div className="rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--bg-card)] p-4 sm:col-span-2 lg:col-span-1">
+        <div className="rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--bg-card)] p-4">
           <p className="text-xs font-medium uppercase text-[var(--text-muted)]">Engagement</p>
           <p className="mt-1 text-sm text-[var(--text-secondary)]">
             {data.engagement.pageViews} views · {data.engagement.shareEvents} shares
@@ -96,6 +103,16 @@ export default function AdminDashboardPage() {
             {data.engagement.messagesTotal} messages total
           </p>
         </div>
+        <Link
+          href="/admin/categories"
+          className="rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--bg-card)] p-4 transition-colors hover:border-[var(--brand-primary)]/40 hover:bg-[var(--bg-muted)]/30"
+        >
+          <p className="text-xs font-medium uppercase text-[var(--text-muted)]">Categories</p>
+          <p className="mt-1 text-2xl font-bold text-[var(--text-primary)]">{data.categories.total}</p>
+          <p className="text-xs text-[var(--text-muted)]">
+            {data.categories.newLast7Days} new in the last 7 days · manage and view stats →
+          </p>
+        </Link>
       </div>
 
       <AdminOverviewCharts data={data} />
