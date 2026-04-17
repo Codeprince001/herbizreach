@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useLogStoreShare, useLogStoreView } from "@/hooks/useStore";
 import { resetSocket } from "@/lib/socket";
+import { absolutizeUrl } from "@/lib/seo";
 import { formatCurrency } from "@/lib/utils";
 import type { Product } from "@/types/product.types";
 import type { PublicStorePayload } from "@/types/store.types";
@@ -38,7 +39,12 @@ export function StoreProductClient(props: {
     product.descriptionAi?.trim() || product.descriptionRaw?.trim() || "";
   const waPhone =
     store.storeSettings?.whatsAppPhone ?? store.business.phone ?? null;
-  const waMsg = `Hi! I'm interested in ${product.name} from ${store.business.businessName}.`;
+  const productPageUrl = absolutizeUrl(`/store/${slug}/products/${product.id}`);
+  const waMsg = `Hello! I'm messaging from your HerBizReach storefront about "${product.name}" from ${store.business.businessName}.
+
+I'm looking at this product page: ${productPageUrl}
+
+Could you let me know if it's available and how I can order? Thank you!`;
   const gallery =
     product.imageUrls?.length ? product.imageUrls : product.imageUrl?.trim() ? [product.imageUrl.trim()] : [];
   const [activeIdx, setActiveIdx] = useState(0);
