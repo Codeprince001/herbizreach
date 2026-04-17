@@ -9,6 +9,7 @@ import {
   MessageSquare,
   Package,
   ScrollText,
+  Tags,
   Users,
 } from "lucide-react";
 import { useState } from "react";
@@ -20,6 +21,7 @@ const NAV = [
   { href: "/admin", label: "Overview", icon: LayoutDashboard, exact: true },
   { href: "/admin/users", label: "Users", icon: Users, exact: false },
   { href: "/admin/products", label: "Products", icon: Package, exact: false },
+  { href: "/admin/categories", label: "Categories", icon: Tags, exact: false },
   { href: "/admin/conversations", label: "Chats", icon: MessageSquare, exact: false },
   { href: "/admin/audit", label: "Audit log", icon: ScrollText, exact: false },
 ] as const;
