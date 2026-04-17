@@ -25,3 +25,27 @@ export function useUpdateStoreSettings() {
     onError: () => toast.error("Could not save settings."),
   });
 }
+
+export function useUploadStoreProfileImage() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (file: File) => StoreSettingsService.uploadProfileImage(file),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: STORE_SETTINGS_KEY });
+      toast.success("Profile picture updated.");
+    },
+    onError: () => toast.error("Could not upload image."),
+  });
+}
+
+export function useClearStoreProfileImage() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: () => StoreSettingsService.clearProfileImage(),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: STORE_SETTINGS_KEY });
+      toast.success("Profile picture removed.");
+    },
+    onError: () => toast.error("Could not remove image."),
+  });
+}
