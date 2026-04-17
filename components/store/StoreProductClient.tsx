@@ -9,17 +9,23 @@ import { Button } from "@/components/ui/button";
 import { useLogStoreShare, useLogStoreView } from "@/hooks/useStore";
 import { resetSocket } from "@/lib/socket";
 import { absolutizeUrl } from "@/lib/seo";
+import { storefrontProductDescription, storefrontProductName } from "@/lib/storefront-product";
 import { formatCurrency } from "@/lib/utils";
 import type { Product } from "@/types/product.types";
-import type { PublicStorePayload } from "@/types/store.types";
+import type { PublicLocaleOption, PublicStorePayload } from "@/types/store.types";
+import { StoreLanguageSwitcher } from "./StoreLanguageSwitcher";
 import { WhatsAppShareButton } from "./WhatsAppShareButton";
 
 export function StoreProductClient(props: {
   slug: string;
   product: Product;
   store: PublicStorePayload;
+  activeLocales?: PublicLocaleOption[];
+  localeApplied?: string | null;
 }) {
-  const { slug, product, store } = props;
+  const { slug, product, store, activeLocales, localeApplied } = props;
+  const locQ =
+    localeApplied ? `?locale=${encodeURIComponent(localeApplied)}` : "";
   const accent = store.storeSettings?.accentColor ?? "#7c3aed";
   const logView = useLogStoreView(slug);
   const logShare = useLogStoreShare(slug);
@@ -35,12 +41,14 @@ export function StoreProductClient(props: {
     };
   }, []);
 
-  const desc =
-    product.descriptionAi?.trim() || product.descriptionRaw?.trim() || "";
+  const pname = storefrontProductName(product);
+  const desc = storefrontProductDescription(product);
   const waPhone =
     store.storeSettings?.whatsAppPhone ?? store.business.phone ?? null;
-  const productPageUrl = absolutizeUrl(`/store/${slug}/products/${product.id}`);
-  const waMsg = `Hello! I'm messaging from your HerBizReach storefront about "${product.name}" from ${store.business.businessName}.
+  const productPageUrl = absolutizeUrl(
+    `/store/${slug}/products/${product.id}${locQ}`,
+  );
+  const waMsg = `Hello! I'm messaging from your HerBizReach storefront about "${pname}" from ${store.business.businessName}.
 
 I'm looking at this product page: ${productPageUrl}
 
@@ -54,7 +62,7 @@ Could you let me know if it's available and how I can order? Thank you!`;
   }, [product.id]);
 
   const imageSrc = gallery[Math.min(activeIdx, Math.max(0, gallery.length - 1))] ?? "";
-  const messageSellerHref = `/store/${slug}/chat?product=${encodeURIComponent(product.id)}`;
+  const messageSellerHref = `/store/${slug}/chat?product=${encodeURIComponent(product.id)}${localeApplied ? `&locale=${encodeURIComponent(localeApplied)}` : ""}`;
 
   async function shareProduct() {
     const url =
@@ -64,8 +72,8 @@ Could you let me know if it's available and how I can order? Thank you!`;
     try {
       if (navigator.share) {
         await navigator.share({
-          title: product.name,
-          text: `Check out ${product.name} at ${store.business.businessName}`,
+          title: pname,
+          text: `Check out ${pname} at ${store.business.businessName}`,
           url,
         });
         logShare.mutate({ productId: product.id, channel: "native_share" });
@@ -93,7 +101,7 @@ Could you let me know if it's available and how I can order? Thank you!`;
             aria-label="Breadcrumb"
           >
             <Link
-              href={`/store/${slug}`}
+              href={`/store/${slug}${locQ}`}
               className="inline-flex max-w-[min(100%,16rem)] items-center gap-1.5 font-medium text-[var(--brand-primary)] hover:underline"
             >
               <Store className="size-4 shrink-0" aria-hidden />
@@ -102,8 +110,14 @@ Could you let me know if it's available and how I can order? Thank you!`;
             <span className="text-[var(--text-muted)]" aria-hidden>
               /
             </span>
-            <span className="min-w-0 truncate text-[var(--text-muted)]">{product.name}</span>
+            <span className="min-w-0 truncate text-[var(--text-muted)]">{pname}</span>
           </nav>
+          <div className="mb-4">
+            <StoreLanguageSwitcher
+              activeLocales={activeLocales ?? store.activeLocales}
+              currentLocale={localeApplied ?? store.locale}
+            />
+          </div>
           {store.storeSettings?.tagline ? (
             <p className="max-w-2xl text-sm text-[var(--text-secondary)]">
               {store.storeSettings.tagline}
@@ -119,7 +133,7 @@ Could you let me know if it's available and how I can order? Thank you!`;
               {imageSrc ? (
                 <Image
                   src={imageSrc}
-                  alt={product.name}
+                  alt={pname}
                   fill
                   className="object-cover"
                   priority
@@ -178,7 +192,7 @@ Could you let me know if it's available and how I can order? Thank you!`;
             ) : null}
 
             <h1 className="font-[family-name:var(--font-display)] text-2xl font-bold leading-tight tracking-tight text-[var(--text-primary)] md:text-3xl lg:text-4xl">
-              {product.name}
+              {pname}
             </h1>
 
             <p
@@ -230,7 +244,7 @@ Could you let me know if it's available and how I can order? Thank you!`;
                 Share product
               </Button>
               <Button variant="ghost" asChild className="min-h-12 border border-[var(--border-default)] sm:w-auto">
-                <Link href={`/store/${slug}`}>More from this store</Link>
+                <Link href={`/store/${slug}${locQ}`}>More from this store</Link>
               </Button>
             </div>
           </div>

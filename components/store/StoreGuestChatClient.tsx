@@ -2,6 +2,7 @@
 
 import { ArrowLeft, ExternalLink, Send } from "lucide-react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
@@ -41,6 +42,12 @@ export function StoreGuestChatClient(props: {
   product: ProductSummary;
 }) {
   const { slug, storeName, accent, chatEnabled, product } = props;
+  const searchParams = useSearchParams();
+  const localeQ = useMemo(() => {
+    const loc = searchParams.get("locale")?.trim();
+    if (!loc) return "";
+    return `?locale=${encodeURIComponent(loc)}`;
+  }, [searchParams]);
   const storageKey = useMemo(
     () => guestChatStorageKey(slug, product?.id ?? null),
     [slug, product?.id],
@@ -152,7 +159,9 @@ export function StoreGuestChatClient(props: {
     }
   }
 
-  const backHref = product ? `/store/${slug}/products/${product.id}` : `/store/${slug}`;
+  const backHref = product
+    ? `/store/${slug}/products/${product.id}${localeQ}`
+    : `/store/${slug}${localeQ}`;
 
   if (!chatEnabled) {
     return (
@@ -193,7 +202,7 @@ export function StoreGuestChatClient(props: {
                 <span className="font-medium">About: {product.name}</span>
                 {" · "}
                 <Link
-                  href={`/store/${slug}/products/${product.id}`}
+                  href={`/store/${slug}/products/${product.id}${localeQ}`}
                   className="inline-flex items-center gap-0.5 font-medium text-[var(--brand-primary)] hover:underline"
                 >
                   View product

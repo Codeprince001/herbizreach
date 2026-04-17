@@ -9,12 +9,14 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useLogStoreShare, useLogStoreView } from "@/hooks/useStore";
 import type { PublicStorePayload } from "@/types/store.types";
+import { StoreLanguageSwitcher } from "./StoreLanguageSwitcher";
 import { StoreProductCard } from "./StoreProductCard";
 import { WhatsAppShareButton } from "./WhatsAppShareButton";
 
 export function StorePublicView(props: { initial: PublicStorePayload }) {
   const { initial } = props;
   const slug = initial.business.businessSlug;
+  const appliedLocale = initial.locale ?? null;
   const accent = initial.storeSettings?.accentColor ?? "#7c3aed";
   const logView = useLogStoreView(slug);
   const logShare = useLogStoreShare(slug);
@@ -119,7 +121,12 @@ export function StorePublicView(props: { initial: PublicStorePayload }) {
               ) : null}
               </div>
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+              <StoreLanguageSwitcher
+                activeLocales={initial.activeLocales}
+                currentLocale={appliedLocale}
+                className="sm:mr-auto"
+              />
               <WhatsAppShareButton phone={waPhone} message={waMsg} />
               <Button
                 type="button"
@@ -144,7 +151,12 @@ export function StorePublicView(props: { initial: PublicStorePayload }) {
         ) : (
           <div className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-6">
             {initial.products.map((p) => (
-              <StoreProductCard key={p.id} product={p} slug={slug} />
+              <StoreProductCard
+                key={p.id}
+                product={p}
+                slug={slug}
+                locale={appliedLocale}
+              />
             ))}
           </div>
         )}
