@@ -1,5 +1,6 @@
 import {
   BarChart3,
+  Bell,
   Home,
   LayoutGrid,
   MessageCircle,
@@ -16,5 +17,6 @@ export const ownerNav = [
 ] as const;
 
 export const ownerNavExtra = [
+  { href: "/notifications", label: "Notification", icon: Bell },
   { href: "/leads", label: "Leads", icon: Users },
 ] as const;
