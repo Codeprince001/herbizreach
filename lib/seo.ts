@@ -8,7 +8,7 @@ const DEFAULT_TITLE = `${SITE_NAME} — Your business, seen by more`;
 
 /** Default meta description (OG, Twitter, JSON-LD). */
 export const DEFAULT_SITE_DESCRIPTION =
-  "AI-powered visibility for women-led SMEs across Africa. Share your catalog, sharpen product copy with AI, and sell on WhatsApp.";
+  "AI-powered storefronts for SMEs across Africa. Share your catalog, sharpen product copy with AI, and sell through WhatsApp.";
 
 /** Public path to default share image (logo). */
 export const DEFAULT_OG_IMAGE_PATH = "/herbizreach-logo.png";
@@ -52,8 +52,8 @@ export function buildStorePageMetadata(slug: string, data: PublicStorePayload): 
   const url = absolutizeUrl(`/store/${slug}`);
   const title = data.business.businessName;
   const description = storeDescription(data);
-  const banner = data.storeSettings?.bannerUrl?.trim();
-  const image = ogImageUrl(banner || null);
+  const profile = data.storeSettings?.profileImageUrl?.trim();
+  const image = ogImageUrl(profile || null);
 
   return {
     title,
@@ -134,7 +134,7 @@ export const rootMetadata: Metadata = {
   applicationName: SITE_NAME,
   keywords: [
     "HerBizReach",
-    "women entrepreneurs",
+    "African SMEs",
     "SME",
     "Africa",
     "Nigeria",
