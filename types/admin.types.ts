@@ -113,5 +113,42 @@ export interface AdminMetricsPayload {
     newProducts7d: number;
     newLeads30d: number;
   };
+  categories: {
+    total: number;
+    newLast7Days: number;
+  };
   seriesLast14Days: AdminMetricsDailyPoint[];
+}
+
+export interface AdminCategoryStats {
+  productCount: number;
+  publishedProductCount: number;
+  pageViewsTotal: number;
+  shareEventsTotal: number;
+  pageViewsLast7Days: number;
+  newProductsLast7Days: number;
+}
+
+export interface AdminCategoryRow {
+  id: string;
+  slug: string;
+  name: string;
+  createdAt: string;
+  stats: AdminCategoryStats;
+}
+
+export interface AdminCategoriesListResponse {
+  items: AdminCategoryRow[];
+}
+
+export interface AdminCreateCategoryPayload {
+  name: string;
+  slug?: string;
+}
+
+export interface AdminCategoryCreated {
+  id: string;
+  slug: string;
+  name: string;
+  createdAt: string;
 }
