@@ -1,3 +1,14 @@
+export type TranslationSource = "AI" | "MANUAL";
+
+export interface ProductTranslation {
+  localeCode: string;
+  name: string;
+  description: string;
+  nameSource: TranslationSource;
+  descriptionSource: TranslationSource;
+  updatedAt: string;
+}
+
 export interface ProductCategory {
   id: string;
   slug: string;
@@ -23,6 +34,11 @@ export interface Product {
   isPublished: boolean;
   createdAt: string;
   categories: ProductCategory[];
+  /** Owner API: localized rows for enabled platform locales. */
+  translations?: ProductTranslation[];
+  /** Public store when `?locale=` is applied. */
+  displayName?: string;
+  displayDescription?: string;
 }
 
 export interface UpdateProductDto {
