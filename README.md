@@ -108,8 +108,8 @@ npm install
 Create `frontend/.env.local`:
 
 ```bash
-NEXT_PUBLIC_API_URL=http://localhost:4000
-NEXT_PUBLIC_APP_URL=http://localhost:3000
+NEXT_PUBLIC_API_URL=https://herbizreach-backend.onrender.com
+NEXT_PUBLIC_APP_URL=https://herbizreach.vercel.app
 ```
 
 - `NEXT_PUBLIC_API_URL`: Backend base URL used by API and socket clients.
