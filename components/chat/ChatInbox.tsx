@@ -1,6 +1,15 @@
 "use client";
 
-import { Archive, ArrowLeft, ExternalLink, MoreVertical, Send } from "lucide-react";
+import {
+  Archive,
+  ArrowLeft,
+  ExternalLink,
+  Loader2,
+  MoreVertical,
+  Send,
+  Sparkles,
+  X,
+} from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -12,6 +21,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useSuggestInboxReplies } from "@/hooks/useAi";
 import { useArchiveConversation, useConversationMessages } from "@/hooks/useChat";
 import { useOwnerActiveConversationJoin } from "@/hooks/useChatSocket";
 import { getSocket } from "@/lib/socket";
@@ -54,8 +64,16 @@ export function ChatInbox(props: { conversations: Conversation[] | undefined; lo
 
   const { data: messagesData } = useConversationMessages(selectedId, null);
   const archive = useArchiveConversation();
+  const suggestReplies = useSuggestInboxReplies();
   const [text, setText] = useState("");
+  const [replyDrafts, setReplyDrafts] = useState<string[] | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  const canSuggestReplies = useMemo(() => {
+    const items = messagesData?.items;
+    if (!items?.length) return false;
+    return items.some((m) => m.senderType === "CUSTOMER" || m.senderType === "GUEST");
+  }, [messagesData?.items]);
 
   useOwnerActiveConversationJoin(selectedId);
 
@@ -68,6 +86,10 @@ export function ChatInbox(props: { conversations: Conversation[] | undefined; lo
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messagesData?.items, selectedId]);
+
+  useEffect(() => {
+    setReplyDrafts(null);
+  }, [selectedId]);
 
   function send() {
     const t = text.trim();
@@ -277,17 +299,82 @@ export function ChatInbox(props: { conversations: Conversation[] | undefined; lo
             </ScrollArea>
 
             {selected.status === "OPEN" ? (
-              <div className="flex gap-2 border-t border-[var(--border-default)] bg-[var(--bg-base)] p-3 pb-safe">
-                <Input
-                  value={text}
-                  onChange={(e) => setText(e.target.value)}
-                  placeholder="Message…"
-                  className="min-h-11 rounded-full border-[var(--border-default)] bg-[var(--bg-card)] px-4"
-                  onKeyDown={(e) => e.key === "Enter" && send()}
-                />
-                <Button type="button" size="icon" className="size-11 shrink-0 rounded-full" onClick={send}>
-                  <Send className="size-4" />
-                </Button>
+              <div className="border-t border-[var(--border-default)] bg-[var(--bg-base)] p-3 pb-safe">
+                {replyDrafts?.length ? (
+                  <div className="mb-3 space-y-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-xs font-medium text-[var(--text-muted)]">Suggested replies</p>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="size-7 shrink-0"
+                        onClick={() => setReplyDrafts(null)}
+                        aria-label="Dismiss suggestions"
+                      >
+                        <X className="size-4" />
+                      </Button>
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      {replyDrafts.map((draft, i) => (
+                        <button
+                          key={`${i}-${draft.slice(0, 24)}`}
+                          type="button"
+                          onClick={() => {
+                            setText(draft);
+                            setReplyDrafts(null);
+                          }}
+                          className="rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--bg-card)] px-3 py-2 text-left text-sm leading-snug text-[var(--text-primary)] ring-[var(--brand-primary)]/15 transition-colors hover:bg-[var(--brand-glow)] hover:ring-1"
+                        >
+                          {draft}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="icon"
+                    className="size-11 shrink-0 rounded-full border border-[var(--border-default)] bg-[var(--bg-card)]"
+                    disabled={
+                      !selectedId ||
+                      !canSuggestReplies ||
+                      suggestReplies.isPending ||
+                      !token
+                    }
+                    onClick={() => {
+                      if (!selectedId) return;
+                      suggestReplies.mutate(
+                        { conversationId: selectedId },
+                        {
+                          onSuccess: (data) => {
+                            if (data.replies?.length) setReplyDrafts(data.replies);
+                          },
+                        },
+                      );
+                    }}
+                    aria-label="Generate smart reply suggestions"
+                    title="Smart replies"
+                  >
+                    {suggestReplies.isPending ? (
+                      <Loader2 className="size-4 animate-spin" aria-hidden />
+                    ) : (
+                      <Sparkles className="size-4 text-[var(--brand-primary)]" aria-hidden />
+                    )}
+                  </Button>
+                  <Input
+                    value={text}
+                    onChange={(e) => setText(e.target.value)}
+                    placeholder="Message…"
+                    className="min-h-11 rounded-full border-[var(--border-default)] bg-[var(--bg-card)] px-4"
+                    onKeyDown={(e) => e.key === "Enter" && send()}
+                  />
+                  <Button type="button" size="icon" className="size-11 shrink-0 rounded-full" onClick={send}>
+                    <Send className="size-4" />
+                  </Button>
+                </div>
               </div>
             ) : null}
           </>
