@@ -3,7 +3,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Copy, Loader2 } from "lucide-react";
 import Image from "next/image";
-import { useEffect, useRef } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -16,7 +17,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { LoadingSkeleton } from "@/components/shared/LoadingSkeleton";
 import { SectionError } from "@/components/shared/SectionError";
+import { useActiveLocales } from "@/hooks/useLocales";
 import {
+  STORE_SETTINGS_KEY,
   useClearStoreProfileImage,
   useStoreSettings,
   useUpdateStoreSettings,
@@ -30,6 +33,7 @@ import {
 } from "@/lib/ng-whatsapp-phone";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { cn } from "@/lib/utils";
+import { StoreSettingsService } from "@/services/store-settings.service";
 
 async function copyToClipboard(text: string, successMessage: string) {
   const trimmed = text.trim();
@@ -78,9 +82,40 @@ function FieldCopyButton({
 }
 
 export default function SettingsPage() {
+  const qc = useQueryClient();
   const user = useAuthStore((s) => s.user);
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
   const { data, isLoading, isError, refetch } = useStoreSettings();
+  const { data: activeLocales } = useActiveLocales();
+  const [stLocale, setStLocale] = useState("");
+  const [stTagline, setStTagline] = useState("");
+  const [stDesc, setStDesc] = useState("");
+
+  const saveStoreTranslation = useMutation({
+    mutationFn: (vars: { code: string; tagline: string; description: string }) =>
+      StoreSettingsService.upsertTranslation(vars.code, {
+        tagline: vars.tagline,
+        description: vars.description,
+        taglineSource: "MANUAL",
+        descriptionSource: "MANUAL",
+      }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: STORE_SETTINGS_KEY });
+      toast.success("Translation saved.");
+    },
+    onError: () => toast.error("Could not save translation."),
+  });
+
+  const deleteStoreTranslation = useMutation({
+    mutationFn: (code: string) => StoreSettingsService.deleteTranslation(code),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: STORE_SETTINGS_KEY });
+      setStTagline("");
+      setStDesc("");
+      toast.success("Translation removed.");
+    },
+    onError: () => toast.error("Could not remove translation."),
+  });
   const update = useUpdateStoreSettings();
   const uploadProfile = useUploadStoreProfileImage();
   const clearProfile = useClearStoreProfileImage();
@@ -108,6 +143,23 @@ export default function SettingsPage() {
   const whatsAppLocal = watch("whatsAppPhone") ?? "";
   const taglineValue = watch("tagline") ?? "";
   const descriptionValue = watch("description") ?? "";
+
+  useEffect(() => {
+    if (!activeLocales?.length) {
+      setStLocale("");
+      return;
+    }
+    if (!stLocale || !activeLocales.some((l) => l.code === stLocale)) {
+      setStLocale(activeLocales[0].code);
+    }
+  }, [activeLocales, stLocale]);
+
+  useEffect(() => {
+    if (!data || !stLocale) return;
+    const row = data.translations?.find((t) => t.localeCode === stLocale);
+    setStTagline(row?.tagline ?? "");
+    setStDesc(row?.description ?? "");
+  }, [data, stLocale]);
 
   useEffect(() => {
     if (!data) return;
@@ -353,6 +405,73 @@ export default function SettingsPage() {
           {update.isPending ? <Loader2 className="size-4 animate-spin" /> : "Save settings"}
         </Button>
       </form>
+
+      {activeLocales?.length ? (
+        <Card className="border-[var(--border-default)] border-dashed">
+          <CardHeader>
+            <CardTitle className="text-base">Store page — other languages</CardTitle>
+            <p className="text-xs text-[var(--text-muted)]">
+              Optional tagline and description when buyers switch language on your public storefront.
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label>Language</Label>
+              <select
+                className="flex h-11 w-full rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--bg-card)] px-3 text-sm"
+                value={stLocale}
+                onChange={(e) => setStLocale(e.target.value)}
+              >
+                {activeLocales.map((l) => (
+                  <option key={l.code} value={l.code}>
+                    {l.labelNative} ({l.labelEnglish})
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="st-tag">Translated tagline</Label>
+              <Textarea id="st-tag" rows={2} value={stTagline} onChange={(e) => setStTagline(e.target.value)} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="st-desc">Translated description</Label>
+              <Textarea id="st-desc" rows={4} value={stDesc} onChange={(e) => setStDesc(e.target.value)} />
+            </div>
+            <Button
+              type="button"
+              className="min-h-11 w-full"
+              disabled={
+                saveStoreTranslation.isPending ||
+                !stLocale ||
+                (!stTagline.trim() && !stDesc.trim())
+              }
+              onClick={() => {
+                if (!stLocale) return;
+                saveStoreTranslation.mutate({
+                  code: stLocale,
+                  tagline: stTagline.trim(),
+                  description: stDesc.trim(),
+                });
+              }}
+            >
+              {saveStoreTranslation.isPending ? <Loader2 className="size-4 animate-spin" /> : "Save translation"}
+            </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              className="min-h-11 w-full border border-[var(--danger)]/50 text-[var(--danger)]"
+              disabled={
+                deleteStoreTranslation.isPending ||
+                !stLocale ||
+                !data?.translations?.some((t) => t.localeCode === stLocale)
+              }
+              onClick={() => stLocale && deleteStoreTranslation.mutate(stLocale)}
+            >
+              Remove this language
+            </Button>
+          </CardContent>
+        </Card>
+      ) : null}
     </div>
   );
 }

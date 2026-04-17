@@ -1,4 +1,4 @@
-import type { Product } from "./product.types";
+import type { Product, TranslationSource } from "./product.types";
 
 export interface PublicBusiness {
   id: string;
@@ -8,6 +8,17 @@ export interface PublicBusiness {
   phone: string | null;
   createdAt: string;
   avatarUrl: string | null;
+}
+
+export interface StoreSettingsTranslation {
+  id: string;
+  storeSettingsId: string;
+  localeCode: string;
+  tagline: string | null;
+  description: string | null;
+  taglineSource: TranslationSource | null;
+  descriptionSource: TranslationSource | null;
+  updatedAt: string;
 }
 
 export interface StoreSettings {
@@ -20,12 +31,23 @@ export interface StoreSettings {
   tagline: string | null;
   description: string | null;
   showChatWidget: boolean;
+  translations?: StoreSettingsTranslation[];
+}
+
+export interface PublicLocaleOption {
+  code: string;
+  labelEnglish: string;
+  labelNative: string;
 }
 
 export interface PublicStorePayload {
   business: PublicBusiness;
   storeSettings: StoreSettings | null;
   products: Product[];
+  /** Applied secondary locale, or null when viewing canonical English. */
+  locale?: string | null;
+  /** Languages admins have left enabled for storefronts. */
+  activeLocales?: PublicLocaleOption[];
 }
 
 export interface Category {

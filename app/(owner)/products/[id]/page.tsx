@@ -23,9 +23,11 @@ import { PageHeader } from "@/components/shared/PageHeader";
 import { SectionError } from "@/components/shared/SectionError";
 import { useImproveDescription } from "@/hooks/useAi";
 import { useCategories } from "@/hooks/useCategories";
+import { useActiveLocales } from "@/hooks/useLocales";
 import { PRODUCTS_KEY, useDeleteProduct, useProduct, useUpdateProduct } from "@/hooks/useProducts";
 import { cn } from "@/lib/utils";
-import { ProductsService } from "@/services/products.service";
+import { AiService } from "@/services/ai.service";
+import { ProductsService, type UpsertProductTranslationPayload } from "@/services/products.service";
 import type { Product } from "@/types/product.types";
 import { toast } from "sonner";
 
@@ -54,6 +56,34 @@ export default function EditProductPage() {
   const [aiResult, setAiResult] = useState({ description_ai: "", caption_ai: "" });
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [published, setPublished] = useState(true);
+  const { data: activeLocales } = useActiveLocales();
+  const [localeTab, setLocaleTab] = useState<string>("");
+  const [trName, setTrName] = useState("");
+  const [trDesc, setTrDesc] = useState("");
+  const [localizePending, setLocalizePending] = useState(false);
+
+  const upsertTranslation = useMutation({
+    mutationFn: (body: UpsertProductTranslationPayload) =>
+      ProductsService.upsertTranslation(id, localeTab, body),
+    onSuccess: (data) => {
+      qc.setQueryData([...PRODUCTS_KEY, id], data);
+      void qc.invalidateQueries({ queryKey: PRODUCTS_KEY });
+      toast.success("Translation saved.");
+    },
+    onError: () => toast.error("Could not save translation."),
+  });
+
+  const deleteTranslation = useMutation({
+    mutationFn: () => ProductsService.deleteTranslation(id, localeTab),
+    onSuccess: (data) => {
+      qc.setQueryData([...PRODUCTS_KEY, id], data);
+      void qc.invalidateQueries({ queryKey: PRODUCTS_KEY });
+      setTrName("");
+      setTrDesc("");
+      toast.success("Translation removed.");
+    },
+    onError: () => toast.error("Could not remove translation."),
+  });
 
   const togglePublish = useMutation({
     mutationFn: (next: boolean) => ProductsService.update(id, { isPublished: next }),
@@ -96,6 +126,23 @@ export default function EditProductPage() {
   });
 
   const desc = watch("descriptionRaw");
+
+  useEffect(() => {
+    if (!activeLocales?.length) {
+      setLocaleTab("");
+      return;
+    }
+    if (!localeTab || !activeLocales.some((l) => l.code === localeTab)) {
+      setLocaleTab(activeLocales[0].code);
+    }
+  }, [activeLocales, localeTab]);
+
+  useEffect(() => {
+    if (!product || !localeTab) return;
+    const row = product.translations?.find((t) => t.localeCode === localeTab);
+    setTrName(row?.name ?? "");
+    setTrDesc(row?.description ?? "");
+  }, [product, localeTab]);
 
   useEffect(() => {
     if (!product) return;
@@ -215,6 +262,135 @@ export default function EditProductPage() {
               }}
               onDismiss={() => setAiOpen(false)}
             />
+            {activeLocales?.length ? (
+              <Card className="border-[var(--border-default)] border-dashed">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base">Other languages</CardTitle>
+                  <p className="text-xs text-[var(--text-muted)]">
+                    English above is your main catalog. Add optional translations buyers see when they pick a
+                    language on your public store.
+                  </p>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="locale-pick">Language</Label>
+                    <select
+                      id="locale-pick"
+                      className="flex h-11 w-full rounded-[var(--radius-md)] border border-[var(--border-default)] bg-[var(--bg-card)] px-3 text-sm"
+                      value={localeTab}
+                      onChange={(e) => setLocaleTab(e.target.value)}
+                    >
+                      {activeLocales.map((l) => (
+                        <option key={l.code} value={l.code}>
+                          {l.labelNative} ({l.labelEnglish})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="tr-name">Translated title</Label>
+                    <Input id="tr-name" value={trName} onChange={(e) => setTrName(e.target.value)} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="tr-desc">Translated description</Label>
+                    <Textarea
+                      id="tr-desc"
+                      rows={5}
+                      value={trDesc}
+                      onChange={(e) => setTrDesc(e.target.value)}
+                      className="min-h-[120px]"
+                    />
+                  </div>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    className="min-h-11 w-full"
+                    disabled={localizePending || !localeTab}
+                    onClick={() => {
+                      if (!localeTab) return;
+                      setLocalizePending(true);
+                      void (async () => {
+                        try {
+                          const res = await AiService.localizeProduct({
+                            productId: id,
+                            localeCode: localeTab,
+                          });
+                          setTrName(res.name);
+                          setTrDesc(res.description);
+                          toast.success("AI suggestion ready — review, then save.");
+                        } catch {
+                          toast.error("Could not generate translation.");
+                        } finally {
+                          setLocalizePending(false);
+                        }
+                      })();
+                    }}
+                  >
+                    <Sparkles className="mr-2 size-4" />
+                    {localizePending ? "Generating…" : "Suggest with AI"}
+                  </Button>
+                  <div className="flex flex-col gap-2 sm:flex-row">
+                    <Button
+                      type="button"
+                      className="min-h-11 flex-1"
+                      disabled={
+                        upsertTranslation.isPending ||
+                        !localeTab ||
+                        !trName.trim() ||
+                        !trDesc.trim()
+                      }
+                      onClick={() => {
+                        upsertTranslation.mutate({
+                          name: trName.trim(),
+                          description: trDesc.trim(),
+                          nameSource: "MANUAL",
+                          descriptionSource: "MANUAL",
+                        });
+                      }}
+                    >
+                      {upsertTranslation.isPending ? (
+                        <Loader2 className="size-4 animate-spin" />
+                      ) : (
+                        "Save translation"
+                      )}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      className="min-h-11 flex-1"
+                      disabled={
+                        upsertTranslation.isPending ||
+                        !localeTab ||
+                        !product?.translations?.some((t) => t.localeCode === localeTab)
+                      }
+                      onClick={() => {
+                        upsertTranslation.mutate({
+                          name: trName.trim(),
+                          description: trDesc.trim(),
+                          nameSource: "AI",
+                          descriptionSource: "AI",
+                        });
+                      }}
+                    >
+                      Save as AI-generated
+                    </Button>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    className="min-h-11 w-full border border-[var(--danger)]/50 text-[var(--danger)]"
+                    disabled={
+                      deleteTranslation.isPending ||
+                      !localeTab ||
+                      !product?.translations?.some((t) => t.localeCode === localeTab)
+                    }
+                    onClick={() => deleteTranslation.mutate()}
+                  >
+                    Remove this language
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : null}
             <div className="space-y-2">
               <div className="flex items-center justify-between gap-2">
                 <Label htmlFor="sku">SKU</Label>
