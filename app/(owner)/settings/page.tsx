@@ -2,7 +2,8 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Copy, Loader2 } from "lucide-react";
-import { useEffect } from "react";
+import Image from "next/image";
+import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -15,7 +16,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { LoadingSkeleton } from "@/components/shared/LoadingSkeleton";
 import { SectionError } from "@/components/shared/SectionError";
-import { useStoreSettings, useUpdateStoreSettings } from "@/hooks/useStoreSettings";
+import {
+  useClearStoreProfileImage,
+  useStoreSettings,
+  useUpdateStoreSettings,
+  useUploadStoreProfileImage,
+} from "@/hooks/useStoreSettings";
+import { DEFAULT_OG_IMAGE_PATH } from "@/lib/seo";
 import {
   composeNgWhatsAppStored,
   sanitizeNgLocalInput,
@@ -75,6 +82,9 @@ export default function SettingsPage() {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
   const { data, isLoading, isError, refetch } = useStoreSettings();
   const update = useUpdateStoreSettings();
+  const uploadProfile = useUploadStoreProfileImage();
+  const clearProfile = useClearStoreProfileImage();
+  const profileFileRef = useRef<HTMLInputElement>(null);
 
   const {
     register,
@@ -142,6 +152,78 @@ export default function SettingsPage() {
           <p className="break-all rounded-[var(--radius-md)] bg-[var(--bg-muted)] p-3 text-sm text-[var(--brand-primary)]">
             {previewUrl}
           </p>
+        </CardContent>
+      </Card>
+
+      <Card className="border-[var(--border-default)]">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base">Store profile picture</CardTitle>
+          <p className="text-sm font-normal text-[var(--text-muted)]">
+            This appears on your public store and as the preview image when your store link is shared on WhatsApp,
+            Facebook, and X. If you skip it, the HerBizReach logo is used instead.
+          </p>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-4 sm:flex-row sm:items-center">
+          <div className="relative mx-auto size-28 shrink-0 overflow-hidden rounded-full border border-[var(--border-default)] bg-[var(--bg-muted)] shadow-sm sm:mx-0">
+            {data.profileImageUrl ? (
+              <Image
+                src={data.profileImageUrl}
+                alt=""
+                fill
+                className="object-cover"
+                unoptimized
+              />
+            ) : (
+              <Image
+                src={DEFAULT_OG_IMAGE_PATH}
+                alt=""
+                fill
+                className="object-contain p-3"
+              />
+            )}
+          </div>
+          <div className="flex min-w-0 flex-1 flex-col gap-3 sm:items-start">
+            <input
+              ref={profileFileRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              className="sr-only"
+              aria-label="Choose store profile picture"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                e.target.value = "";
+                if (file) uploadProfile.mutate(file);
+              }}
+            />
+            <div className="flex flex-wrap justify-center gap-2 sm:justify-start">
+              <Button
+                type="button"
+                variant="secondary"
+                className="min-h-11"
+                disabled={uploadProfile.isPending}
+                onClick={() => profileFileRef.current?.click()}
+              >
+                {uploadProfile.isPending ? (
+                  <Loader2 className="size-4 animate-spin" aria-hidden />
+                ) : null}
+                {uploadProfile.isPending ? "Uploading…" : "Upload photo"}
+              </Button>
+              {data.profileImageUrl ? (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  className="min-h-11"
+                  disabled={clearProfile.isPending}
+                  onClick={() => void clearProfile.mutate()}
+                >
+                  {clearProfile.isPending ? <Loader2 className="size-4 animate-spin" /> : "Remove"}
+                </Button>
+              ) : null}
+            </div>
+            <p className="text-center text-xs text-[var(--text-muted)] sm:text-left">
+              JPEG, PNG, WebP, or GIF · up to 5&nbsp;MB
+            </p>
+          </div>
         </CardContent>
       </Card>
 
