@@ -1,20 +1,86 @@
-# Run from: C:\Users\Windows\Documents\herbizreach\frontend
-# Each block: stage related files, then commit with its own message.
+# Run from: frontend/
+# Each block is one atomic commit. Paths use forward slashes; quote paths with parentheses.
 
-git add "package.json" "package-lock.json"; git commit -m "chore(deps): add @tanstack/react-table for admin data grids"
+git add "README.md"; git commit -m "docs(frontend): refresh README for current app setup, env vars, and developer workflow"
 
-git add "types/admin.types.ts"; git commit -m "feat(types): add admin API types for users, products, audit, and conversations"
+git add "app/(auth)/register/page.tsx"; git commit -m "feat(auth): refine registration page layout, validation UX, and post-signup flow"
 
-git add "components/ui/dialog.tsx"; git commit -m "feat(ui): add Dialog component (Radix) for admin forms"
+git add "app/(owner)/dashboard/page.tsx"; git commit -m "feat(owner): improve dashboard data presentation, empty states, and navigation to key actions"
 
-git add "components/admin/AdminDataTable.tsx" "components/admin/AdminPagination.tsx" "components/admin/AdminSidebar.tsx"; git commit -m "feat(admin): add responsive sidebar, TanStack table wrapper, and pagination"
+git add "app/(owner)/products/[id]/page.tsx"; git commit -m "feat(owner): tighten product edit page loading, error handling, and form integration with store APIs"
 
-git add "services/admin.service.ts" "hooks/useAdmin.ts"; git commit -m "feat(admin): extend admin API client and React Query hooks"
+git add "app/(owner)/products/new/page.tsx"; git commit -m "feat(owner): enhance new product flow with clearer defaults, SKU helpers, and submission feedback"
 
-git add "app/admin/layout.tsx" "app/admin/admin-layout-client.tsx" "app/admin/page.tsx" "app/admin/users/page.tsx" "app/admin/products/page.tsx" "app/admin/conversations/page.tsx" "app/admin/audit/page.tsx"; git commit -m "feat(admin): implement admin console pages (overview, users, products, chats, audit)"
+git add "app/(owner)/settings/page.tsx"; git commit -m "feat(owner): extend store settings UI for branding, preferences, and alignment with settings service types"
 
-git add "lib/seo.ts" "components/seo/WebSiteJsonLd.tsx" "app/robots.ts" "app/sitemap.ts"; git commit -m "feat(seo): add robots.txt, sitemap, JSON-LD helper, and SEO utilities"
+git add "app/admin/page.tsx"; git commit -m "feat(admin): update admin home overview, metrics, and entry points to admin tools"
 
-git add "app/layout.tsx" "app/(auth)/layout.tsx" "app/(owner)/layout.tsx" "app/(owner)/owner-layout-client.tsx"; git commit -m "refactor(layout): split client shells and adjust root, auth, and owner layouts"
+git add "app/page.tsx"; git commit -m "feat(marketing): refresh landing page copy, CTAs, and sections for storefront positioning and SEO hooks"
 
-git add "app/store/[slug]/page.tsx" "app/store/[slug]/chat/page.tsx" "app/store/[slug]/products/[productId]/page.tsx"; git commit -m "feat(store): update storefront, chat, and product pages"
+git add "app/store/[slug]/manifest/route.ts"; git commit -m "fix(store): correct PWA manifest route behavior for dynamic store slugs and caching headers"
+
+git add "components/admin/AdminSidebar.tsx"; git commit -m "feat(admin): align admin sidebar navigation with new routes and active-state styling"
+
+git add "components/auth/AuthLayout.tsx"; git commit -m "style(auth): polish auth shell spacing, branding, and responsive layout for login and register"
+
+git add "components/chat/ChatInbox.tsx"; git commit -m "feat(chat): improve inbox threading, read state, and empty states for owner conversations"
+
+git add "components/chat/ChatWidget.tsx"; git commit -m "feat(chat): refine embeddable chat widget lifecycle, positioning, and connection status UX"
+
+git add "components/layout/TopBar.tsx"; git commit -m "feat(layout): extend top bar with notifications entry, store context, and consistent actions"
+
+git add "components/layout/nav-config.ts"; git commit -m "feat(layout): expand nav configuration for dashboard, admin, and notification destinations"
+
+git add "components/store/StoreGuestChatClient.tsx"; git commit -m "feat(storefront): harden guest chat client with persistence helpers and reconnection-friendly state"
+
+git add "components/store/StoreProductClient.tsx"; git commit -m "feat(storefront): improve public product detail interactivity, variants, and add-to-cart messaging"
+
+git add "components/store/StorePublicView.tsx"; git commit -m "feat(storefront): refine public store layout, hero, and product grid for faster perceived load"
+
+git add "hooks/useAdmin.ts"; git commit -m "feat(admin): extend admin data hook for richer queries, loading flags, and error normalization"
+
+git add "hooks/useAi.ts"; git commit -m "feat(ai): align AI hook with updated streaming or completion endpoints and typed responses"
+
+git add "hooks/useStoreSettings.ts"; git commit -m "feat(owner): sync store settings hook with expanded settings schema and optimistic updates"
+
+git add "lib/demo-store.ts"; git commit -m "chore(lib): update demo store fixtures and helpers for previews and local development"
+
+git add "lib/seo.ts"; git commit -m "feat(seo): improve metadata builders for store pages, titles, and canonical URLs"
+
+git add "services/admin.service.ts"; git commit -m "feat(admin): broaden admin service methods for moderation, listings, and typed API contracts"
+
+git add "services/ai.service.ts"; git commit -m "feat(ai): update AI service client for revised request payloads and response parsing"
+
+git add "services/auth.service.ts"; git commit -m "fix(auth): tighten auth service registration and session helpers for edge cases and errors"
+
+git add "services/store-settings.service.ts"; git commit -m "feat(owner): extend store settings service for new fields and consistent DTO mapping"
+
+git add "types/admin.types.ts"; git commit -m "types(admin): expand admin TypeScript models for API responses and UI state"
+
+git add "types/store.types.ts"; git commit -m "types(store): widen store-related types for products, settings, and public storefront views"
+
+# --- Untracked (new files) ---
+
+git add "app/(owner)/dashboard/loading.tsx"; git commit -m "feat(owner): add dashboard route loading skeleton for smoother navigation transitions"
+
+git add "app/(owner)/notifications/page.tsx"; git commit -m "feat(owner): add notifications page for in-app alerts and read or dismiss actions"
+
+git add "app/admin/categories/page.tsx"; git commit -m "feat(admin): add categories admin page for browsing and managing taxonomy"
+
+git add "components/dashboard/DashboardLoadingState.tsx"; git commit -m "feat(owner): extract reusable dashboard loading UI for shared skeleton patterns"
+
+git add "components/layout/NotificationNavLink.tsx"; git commit -m "feat(layout): add notification nav link with unread badge integration for top navigation"
+
+git add "components/product/ProductSkuSuggestButton.tsx"; git commit -m "feat(product): add SKU suggest control wired to SKU generation helper and product forms"
+
+git add "components/store/StorefrontSkeletons.tsx"; git commit -m "feat(storefront): introduce storefront skeleton components to reduce layout shift"
+
+git add "hooks/useNotifications.ts"; git commit -m "feat(notifications): add notifications hook for fetching, marking read, and polling or invalidation"
+
+git add "lib/generate-product-sku.ts"; git commit -m "feat(lib): add deterministic product SKU generator for owner product creation flows"
+
+git add "lib/guest-chat-storage.ts"; git commit -m "feat(chat): add guest chat local storage utilities for anonymous session continuity"
+
+git add "services/notifications.service.ts"; git commit -m "feat(notifications): add notifications API client for list, mark-read, and preferences"
+
+git add "types/notification.types.ts"; git commit -m "types(notifications): define notification entities and payloads shared by hooks and services"
