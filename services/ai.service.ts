@@ -13,6 +13,12 @@ export interface SuggestInboxRepliesResult {
   replies: string[];
 }
 
+export interface LocalizeProductResult {
+  localeCode: string;
+  name: string;
+  description: string;
+}
+
 export const AiService = {
   improveDescription: (body: { descriptionRaw: string; productName?: string }) =>
     api
@@ -26,4 +32,7 @@ export const AiService = {
     api
       .post<SuggestInboxRepliesResult>("/ai/suggest-inbox-replies", body)
       .then((r) => r.data),
+
+  localizeProduct: (body: { productId: string; localeCode: string }) =>
+    api.post<LocalizeProductResult>("/ai/localize-product", body).then((r) => r.data),
 };
