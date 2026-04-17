@@ -25,10 +25,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { EngagementChart } from "@/components/analytics/EngagementChart";
+import { DashboardLoadingState } from "@/components/dashboard/DashboardLoadingState";
 import { BrandLogo } from "@/components/layout/BrandLogo";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { SectionError } from "@/components/shared/SectionError";
-import { LoadingSkeleton } from "@/components/shared/LoadingSkeleton";
 import { useAnalyticsOverview } from "@/hooks/useAnalytics";
 import { useLeads } from "@/hooks/useLeads";
 import { useDuplicateProduct, useProducts } from "@/hooks/useProducts";
@@ -69,7 +69,7 @@ function DashboardMetricCard({
   icon: Icon,
   trend,
   iconBg,
-  iconClassName,
+  iconClassName = "",
   trendCompareSuffix = "vs last 7 days",
   periodHintWhenNoTrend = "vs last 7 days",
 }: {
@@ -77,8 +77,10 @@ function DashboardMetricCard({
   value: string | number;
   icon: typeof Eye;
   trend: { pct: number; up: boolean } | null;
+  /** Background + icon color (use solid fill + `text-white` in light for contrast). */
   iconBg: string;
-  iconClassName: string;
+  /** Optional extra classes on the SVG (usually empty). */
+  iconClassName?: string;
   trendCompareSuffix?: string;
   periodHintWhenNoTrend?: string;
 }) {
@@ -86,8 +88,13 @@ function DashboardMetricCard({
     <div className="min-w-[140px] shrink-0 snap-start rounded-2xl bg-[var(--bg-card)] p-3.5 shadow-[var(--shadow-sm)] ring-1 ring-[var(--border-default)] md:min-w-0">
       <div className="flex items-start justify-between gap-2">
         <p className="text-[11px] font-semibold uppercase tracking-wide text-[var(--text-muted)]">{label}</p>
-        <div className={cn("flex size-9 shrink-0 items-center justify-center rounded-full", iconBg)}>
-          <Icon className={cn("size-4", iconClassName)} />
+        <div
+          className={cn(
+            "flex size-9 shrink-0 items-center justify-center rounded-full shadow-sm ring-1 ring-black/10 dark:ring-white/10",
+            iconBg,
+          )}
+        >
+          <Icon className={cn("size-4 shrink-0", iconClassName)} strokeWidth={2} aria-hidden />
         </div>
       </div>
       <p className="mt-2 font-[family-name:var(--font-display)] text-2xl font-bold tracking-tight text-[var(--text-primary)]">
@@ -131,7 +138,7 @@ function DashboardMobileHeader() {
           variant="ghost"
           size="icon"
           className="text-white hover:bg-white/10"
-          aria-label="Notifications"
+          aria-label="Notification"
         >
           <Bell className="size-5" />
         </Button>
@@ -154,6 +161,15 @@ function DashboardMobileHeader() {
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
               <Link href="/dashboard">Dashboard</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link
+                href={user?.businessSlug ? `/store/${user.businessSlug}` : "/settings"}
+                target={user?.businessSlug ? "_blank" : undefined}
+                rel={user?.businessSlug ? "noopener noreferrer" : undefined}
+              >
+                My store
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => {
@@ -210,7 +226,7 @@ export default function DashboardPage() {
   );
 
   if (isLoading) {
-    return <LoadingSkeleton />;
+    return <DashboardLoadingState message="Fetching your latest store performance and product updates." />;
   }
 
   if (isError || !data) {
@@ -276,8 +292,7 @@ export default function DashboardPage() {
             value={formatCompact(views7d)}
             icon={Eye}
             trend={trend}
-            iconBg="bg-violet-100 dark:bg-violet-500/20"
-            iconClassName="text-violet-800 dark:text-violet-200"
+            iconBg="bg-violet-600 text-white dark:bg-violet-500/25 dark:text-violet-200"
             trendCompareSuffix="vs earlier this week"
             periodHintWhenNoTrend="Last 7 days · page views on your store"
           />
@@ -286,24 +301,21 @@ export default function DashboardPage() {
             value={formatCompact(data.totals.shares)}
             icon={Send}
             trend={trend}
-            iconBg="bg-sky-100 dark:bg-sky-500/20"
-            iconClassName="text-sky-800 dark:text-sky-200"
+            iconBg="bg-sky-600 text-white dark:bg-sky-500/25 dark:text-sky-200"
           />
           <DashboardMetricCard
             label="Leads"
             value={formatCompact(leadCount)}
             icon={Users}
             trend={trend}
-            iconBg="bg-emerald-100 dark:bg-emerald-500/20"
-            iconClassName="text-emerald-800 dark:text-emerald-200"
+            iconBg="bg-emerald-600 text-white dark:bg-emerald-500/25 dark:text-emerald-200"
           />
           <DashboardMetricCard
             label="WhatsApp taps"
             value={formatCompact(data.totals.shares)}
             icon={Send}
             trend={trend}
-            iconBg="bg-green-100 dark:bg-green-500/20"
-            iconClassName="text-green-800 dark:text-green-200"
+            iconBg="bg-green-600 text-white dark:bg-green-500/25 dark:text-green-200"
           />
         </div>
       </div>
@@ -388,7 +400,11 @@ export default function DashboardPage() {
           <Link href="/products/new">Add product</Link>
         </Button>
         <Button asChild variant="secondary" className="min-h-11">
-          <Link href={user?.businessSlug ? `/store/${user.businessSlug}` : "/settings"}>
+          <Link
+            href={user?.businessSlug ? `/store/${user.businessSlug}` : "/settings"}
+            target={user?.businessSlug ? "_blank" : undefined}
+            rel={user?.businessSlug ? "noopener noreferrer" : undefined}
+          >
             View store
           </Link>
         </Button>
