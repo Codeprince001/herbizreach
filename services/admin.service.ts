@@ -1,6 +1,9 @@
 import api from "@/lib/axios";
 import type {
+  AdminCategoriesListResponse,
+  AdminCategoryCreated,
   AdminConversationRow,
+  AdminCreateCategoryPayload,
   AdminProduct,
   AdminUpdateProductPayload,
   AdminUpdateUserPayload,
@@ -20,6 +23,12 @@ export interface Paginated<T> {
 
 export const AdminService = {
   metrics: () => api.get("/admin/metrics").then((r) => r.data),
+
+  listCategories: () =>
+    api.get<AdminCategoriesListResponse>("/admin/categories").then((r) => r.data),
+
+  createCategory: (body: AdminCreateCategoryPayload) =>
+    api.post<AdminCategoryCreated>("/admin/categories", body).then((r) => r.data),
 
   listUsers: (params: {
     page?: number;
