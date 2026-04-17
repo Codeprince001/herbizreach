@@ -1,13 +1,15 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, Sparkles } from "lucide-react";
+import { ArrowLeft, Loader2, Sparkles } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { AiSuggestionPanel } from "@/components/product/AiSuggestionPanel";
 import { MultiImageUploader } from "@/components/product/MultiImageUploader";
+import { ProductSkuSuggestButton } from "@/components/product/ProductSkuSuggestButton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -97,7 +99,19 @@ export default function NewProductPage() {
 
   return (
     <div className="mx-auto max-w-xl space-y-6 pb-24">
-      <PageHeader title="Add product" description="Photos first (up to 8), then details." />
+      <div className="mb-6 space-y-3 px-4 md:px-0">
+        <Button variant="ghost" size="sm" className="-ml-2 h-9 w-fit gap-1.5 px-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)]" asChild>
+          <Link href="/products">
+            <ArrowLeft className="size-4 shrink-0" aria-hidden />
+            Back
+          </Link>
+        </Button>
+        <PageHeader
+          title="Add product"
+          description="Photos first (up to 8), then details."
+          className="mb-0 px-0"
+        />
+      </div>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
         <Card className="border-[var(--border-default)]">
           <CardHeader>
@@ -178,7 +192,14 @@ export default function NewProductPage() {
               onDismiss={() => setAiOpen(false)}
             />
             <div className="space-y-2">
-              <Label htmlFor="sku">SKU (optional)</Label>
+              <div className="flex items-center justify-between gap-2">
+                <Label htmlFor="sku">SKU (optional)</Label>
+                <ProductSkuSuggestButton
+                  productName={watch("name")}
+                  descriptionRaw={watch("descriptionRaw")}
+                  onApplied={(sku) => setValue("sku", sku)}
+                />
+              </div>
               <Input id="sku" {...register("sku")} />
             </div>
             <div className="space-y-2">
