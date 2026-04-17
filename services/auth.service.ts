@@ -10,7 +10,7 @@ export const AuthService = {
     email: string;
     password: string;
     businessName: string;
-    phone?: string;
+    phone: string;
   }) => api.post<AuthResponse>("/auth/register", body).then((r) => r.data),
 
   me: () => api.get<AuthUser>("/auth/me").then((r) => r.data),
