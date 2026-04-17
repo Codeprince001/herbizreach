@@ -6,6 +6,8 @@ import {
 } from "@tanstack/react-query";
 import { AdminService, type Paginated } from "@/services/admin.service";
 import type {
+  AdminCategoriesListResponse,
+  AdminCreateCategoryPayload,
   AdminProduct,
   AdminUpdateProductPayload,
   AdminUpdateUserPayload,
@@ -16,6 +18,8 @@ import type { UserRole } from "@/types/auth.types";
 import type { AdminConversationRow } from "@/types/admin.types";
 
 export const ADMIN_METRICS_KEY = ["admin", "metrics"] as const;
+
+export const ADMIN_CATEGORIES_KEY = ["admin", "categories"] as const;
 
 export const adminUsersKey = (params: {
   page: number;
@@ -52,6 +56,27 @@ export function useAdminMetrics() {
   return useQuery({
     queryKey: ADMIN_METRICS_KEY,
     queryFn: () => AdminService.metrics(),
+  });
+}
+
+export function useAdminCategories(
+  options?: Omit<UseQueryOptions<AdminCategoriesListResponse>, "queryKey" | "queryFn">,
+) {
+  return useQuery({
+    queryKey: ADMIN_CATEGORIES_KEY,
+    queryFn: () => AdminService.listCategories(),
+    ...options,
+  });
+}
+
+export function useAdminCreateCategory() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (body: AdminCreateCategoryPayload) => AdminService.createCategory(body),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ADMIN_CATEGORIES_KEY });
+      void qc.invalidateQueries({ queryKey: ADMIN_METRICS_KEY });
+    },
   });
 }
 
