@@ -113,7 +113,19 @@ export function getDemoStorePayload(): PublicStorePayload {
         "This is a sample HerBizReach storefront so you can explore the layout, product cards, and WhatsApp actions before you publish your own store.",
       showChatWidget: true,
     },
-    products: demoProducts(),
+    products: demoProducts().map((p) => ({
+      ...p,
+      displayName: p.name,
+      displayDescription:
+        p.descriptionAi?.trim() || p.descriptionRaw?.trim() || "",
+    })),
+    locale: null,
+    activeLocales: [
+      { code: "pcm", labelEnglish: "Nigerian Pidgin", labelNative: "Naija Pidgin" },
+      { code: "yo", labelEnglish: "Yoruba", labelNative: "Yorùbá" },
+      { code: "sw", labelEnglish: "Swahili", labelNative: "Kiswahili" },
+      { code: "fr", labelEnglish: "French (WAEMU)", labelNative: "Français" },
+    ],
   };
 }
 
