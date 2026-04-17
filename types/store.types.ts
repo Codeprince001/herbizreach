@@ -15,6 +15,7 @@ export interface StoreSettings {
   userId: string;
   whatsAppPhone: string | null;
   bannerUrl: string | null;
+  profileImageUrl: string | null;
   accentColor: string | null;
   tagline: string | null;
   description: string | null;
