@@ -106,6 +106,7 @@ export function getDemoStorePayload(): PublicStorePayload {
       userId: "demo-user",
       whatsAppPhone: "+2348000000000",
       bannerUrl: null,
+      profileImageUrl: null,
       accentColor: "#7c3aed",
       tagline: "Bold prints, clean skincare, and statement accessories — shipped with love.",
       description:
