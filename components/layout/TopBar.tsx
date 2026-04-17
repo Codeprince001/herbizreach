@@ -1,6 +1,5 @@
 "use client";
 
-import { Bell } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -13,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { BrandLogo } from "./BrandLogo";
+import { NotificationNavLink } from "./NotificationNavLink";
 import { ThemeToggle } from "./ThemeToggle";
 
 const titles: Record<string, string> = {
@@ -22,6 +22,7 @@ const titles: Record<string, string> = {
   "/analytics": "Analytics",
   "/leads": "Leads",
   "/chat": "Messages",
+  "/notifications": "Notification",
   "/settings": "Store settings",
 };
 
@@ -56,9 +57,7 @@ export function TopBar() {
       </div>
 
       <div className="flex items-center gap-1">
-        <Button type="button" variant="ghost" size="icon" aria-label="Notifications">
-          <Bell className="size-5 text-[var(--text-muted)]" />
-        </Button>
+        <NotificationNavLink />
         <ThemeToggle />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -79,6 +78,15 @@ export function TopBar() {
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
               <Link href="/dashboard">Dashboard</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link
+                href={user?.businessSlug ? `/store/${user.businessSlug}` : "/settings"}
+                target={user?.businessSlug ? "_blank" : undefined}
+                rel={user?.businessSlug ? "noopener noreferrer" : undefined}
+              >
+                My store
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => {
