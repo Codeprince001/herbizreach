@@ -67,7 +67,7 @@ export function AuthLayout({ children }: { children: ReactNode }) {
           <div className="flex flex-1 flex-col items-center justify-center gap-10 py-8 text-center">
             <div className="mx-auto max-w-[22rem] space-y-4">
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/70">
-                Women-led business toolkit
+                Built for African SMEs
               </p>
               <div className="flex justify-center">
                 <BrandLogo href="/" heightClass="h-14 lg:h-16" withLightPanel priority />
@@ -99,7 +99,7 @@ export function AuthLayout({ children }: { children: ReactNode }) {
 
           <div className="relative z-10 flex shrink-0 flex-col items-center border-t border-white/15 pt-8 text-center">
             <p className="max-w-xs text-xs leading-relaxed text-white/65">
-              Women in Tech Hackathon 2026
+              Originated at the Women in Tech Hackathon 2026
             </p>
           </div>
         </div>
