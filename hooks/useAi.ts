@@ -8,3 +8,17 @@ export function useImproveDescription() {
     onError: () => toast.error("AI is unavailable. Try again later."),
   });
 }
+
+/** No global toast: caller may fall back to offline SKU if this fails. */
+export function useSuggestSku() {
+  return useMutation({
+    mutationFn: AiService.suggestSku,
+  });
+}
+
+export function useSuggestInboxReplies() {
+  return useMutation({
+    mutationFn: AiService.suggestInboxReplies,
+    onError: () => toast.error("Could not generate replies. Try again later."),
+  });
+}
