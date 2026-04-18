@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { AiService } from "@/services/ai.service";
 import { ProductsService } from "@/services/products.service";
 import type { UpdateProductDto } from "@/types/product.types";
 
@@ -69,6 +70,20 @@ export function useAppendProductImages(id: string) {
       toast.success("Photos added.");
     },
     onError: () => toast.error("Could not add photos."),
+  });
+}
+
+export function useEnhanceProductImage(productId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (imageUrl: string) =>
+      AiService.enhanceProductImage({ productId, imageUrl }),
+    onSuccess: (data) => {
+      qc.setQueryData([...PRODUCTS_KEY, productId], data);
+      void qc.invalidateQueries({ queryKey: PRODUCTS_KEY });
+      toast.success("Image enhanced.");
+    },
+    onError: () => toast.error("Could not enhance image. Try again."),
   });
 }
 

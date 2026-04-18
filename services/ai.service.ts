@@ -1,4 +1,5 @@
 import api from "@/lib/axios";
+import type { Product } from "@/types/product.types";
 
 export interface ImproveDescriptionResult {
   description_ai: string;
@@ -35,4 +36,7 @@ export const AiService = {
 
   localizeProduct: (body: { productId: string; localeCode: string }) =>
     api.post<LocalizeProductResult>("/ai/localize-product", body).then((r) => r.data),
+
+  enhanceProductImage: (body: { productId: string; imageUrl: string }) =>
+    api.post<Product>("/ai/enhance-product-image", body).then((r) => r.data),
 };

@@ -176,16 +176,23 @@ export default function EditProductPage() {
 
   function onSave(values: FormValues) {
     const categoryIds = values.categoryId ? [values.categoryId] : [];
-    updateProduct.mutate({
-      name: values.name,
-      price: parseFloat(values.price),
-      descriptionRaw: values.descriptionRaw,
-      sku: values.sku?.trim() || undefined,
-      stockQuantity: values.stockQuantity?.trim()
-        ? parseInt(values.stockQuantity, 10)
-        : undefined,
-      categoryIds,
-    });
+    updateProduct.mutate(
+      {
+        name: values.name,
+        price: parseFloat(values.price),
+        descriptionRaw: values.descriptionRaw,
+        sku: values.sku?.trim() || undefined,
+        stockQuantity: values.stockQuantity?.trim()
+          ? parseInt(values.stockQuantity, 10)
+          : undefined,
+        categoryIds,
+      },
+      {
+        onSuccess: () => {
+          router.push("/products");
+        },
+      },
+    );
   }
 
   if (isLoading) {
@@ -196,9 +203,9 @@ export default function EditProductPage() {
   }
 
   return (
-    <div className="mx-auto max-w-xl space-y-6 pb-24">
-      <PageHeader title="Edit product" />
-      <div className="flex items-center justify-between rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--bg-card)] px-4 py-3">
+    <div className="mx-auto w-full max-w-7xl space-y-6 pb-24">
+      <PageHeader title="Edit product" className="px-0" />
+      <div className="flex flex-col gap-3 rounded-[var(--radius-lg)] border border-[var(--border-default)] bg-[var(--bg-card)] px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
         <div>
           <p className="text-sm font-medium text-[var(--text-primary)]">Published</p>
           <p className="text-xs text-[var(--text-muted)]">Visible on your public store</p>
@@ -207,23 +214,31 @@ export default function EditProductPage() {
           checked={published}
           onCheckedChange={(v) => togglePublish.mutate(v)}
           disabled={togglePublish.isPending}
+          className="shrink-0 self-end sm:self-auto"
         />
       </div>
 
       <form onSubmit={handleSubmit(onSave)} className="space-y-6">
-        <ProductGalleryEditor
-          productId={id}
-          imageUrls={
-            product.imageUrls?.length
-              ? product.imageUrls
-              : product.imageUrl
-                ? [product.imageUrl]
-                : []
-          }
-        />
+        <div className="flex flex-col gap-6 lg:grid lg:grid-cols-12 lg:items-start lg:gap-8">
+          <div className="min-w-0 lg:col-span-6">
+            <div className="lg:sticky lg:top-24 lg:z-10">
+              <ProductGalleryEditor
+                productId={id}
+                imageUrls={
+                  product.imageUrls?.length
+                    ? product.imageUrls
+                    : product.imageUrl
+                      ? [product.imageUrl]
+                      : []
+                }
+              />
+            </div>
+          </div>
 
+          <div className="min-w-0 space-y-6 lg:col-span-6">
         <Card className="border-[var(--border-default)]">
-          <CardContent className="space-y-4 pt-6">
+          <CardContent className="space-y-4 pt-6 mt-8">
+            <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="name">Name</Label>
               <Input
@@ -239,6 +254,7 @@ export default function EditProductPage() {
                 className={cn(errors.price && "border-[var(--danger)]")}
                 {...register("price")}
               />
+            </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="descriptionRaw">Description</Label>
@@ -391,6 +407,7 @@ export default function EditProductPage() {
                 </CardContent>
               </Card>
             ) : null}
+            <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <div className="flex items-center justify-between gap-2">
                 <Label htmlFor="sku">SKU</Label>
@@ -405,6 +422,7 @@ export default function EditProductPage() {
             <div className="space-y-2">
               <Label htmlFor="stockQuantity">Stock</Label>
               <Input id="stockQuantity" {...register("stockQuantity")} />
+            </div>
             </div>
             <div className="space-y-2">
               <Label>Category</Label>
@@ -422,6 +440,8 @@ export default function EditProductPage() {
             </div>
           </CardContent>
         </Card>
+          </div>
+        </div>
 
         <div className="flex flex-col gap-2 sm:flex-row">
           <Button type="submit" className="min-h-11 flex-1" disabled={updateProduct.isPending}>
