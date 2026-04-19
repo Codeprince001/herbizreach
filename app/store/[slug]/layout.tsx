@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from "next";
-import { AddToHomeBanner } from "@/components/store/AddToHomeBanner";
 import { StorePwaRegister } from "@/components/store/StorePwaRegister";
 
 type Props = {
@@ -26,12 +25,10 @@ export const viewport: Viewport = {
   themeColor: "#7c3aed",
 };
 
-export default async function PublicStoreLayout({ children, params }: Props) {
-  const { slug } = await params;
+export default function PublicStoreLayout({ children }: Props) {
   return (
     <>
       <StorePwaRegister />
-      <AddToHomeBanner storeSlug={slug} />
       {children}
     </>
   );
