@@ -5,7 +5,6 @@ import Image from "next/image";
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useAppendProductImages, useEnhanceProductImage, useUpdateProduct } from "@/hooks/useProducts";
 import { cn } from "@/lib/utils";
 
@@ -14,10 +13,7 @@ const MAX_IMAGES = 8;
 export function ProductGalleryEditor(props: { productId: string; imageUrls: string[] }) {
   const { productId, imageUrls } = props;
   const [urls, setUrls] = useState<string[]>(imageUrls);
-  const [selectedIdx, setSelectedIdx] = useState(0);
-  const [previewOpen, setPreviewOpen] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
-  const stripRef = useRef<HTMLDivElement>(null);
   const updateProduct = useUpdateProduct(productId);
   const appendImages = useAppendProductImages(productId);
   const enhanceImage = useEnhanceProductImage(productId);
@@ -25,20 +21,6 @@ export function ProductGalleryEditor(props: { productId: string; imageUrls: stri
   useEffect(() => {
     setUrls([...imageUrls]);
   }, [productId, imageUrls.join("\n")]);
-
-  useEffect(() => {
-    setSelectedIdx(0);
-  }, [productId]);
-
-  useEffect(() => {
-    if (!urls.length) return;
-    setSelectedIdx((s) => Math.min(s, urls.length - 1));
-  }, [urls.length]);
-
-  useEffect(() => {
-    const el = stripRef.current?.querySelector(`[data-thumb-index="${selectedIdx}"]`);
-    el?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
-  }, [selectedIdx]);
 
   function persistOrder(next: string[]) {
     const prev = urls;
@@ -65,14 +47,6 @@ export function ProductGalleryEditor(props: { productId: string; imageUrls: stri
     persistOrder(next);
   }
 
-  function moveSelected(dir: -1 | 1) {
-    const i = selectedIdx;
-    if (dir === -1 && i === 0) return;
-    if (dir === 1 && i === urls.length - 1) return;
-    move(i, dir);
-    setSelectedIdx(i + dir);
-  }
-
   function onPickFiles(e: ChangeEvent<HTMLInputElement>) {
     const list = e.target.files;
     if (!list?.length) return;
@@ -91,10 +65,8 @@ export function ProductGalleryEditor(props: { productId: string; imageUrls: stri
 
   const busy = updateProduct.isPending || appendImages.isPending || enhanceImage.isPending;
   const room = MAX_IMAGES - urls.length;
+  /** Fewer, larger cells for 1–4 photos; denser grid so 5–8 do not stretch the page. */
   const manyPhotos = urls.length >= 5;
-  const selectedUrl = urls[selectedIdx];
-  const canMoveLeft = selectedIdx > 0;
-  const canMoveRight = selectedIdx < urls.length - 1;
 
   return (
     <Card className="border-[var(--border-default)]">
@@ -141,154 +113,9 @@ export function ProductGalleryEditor(props: { productId: string; imageUrls: stri
             Enhancing image with AI…
           </p>
         ) : null}
-
-        {/* Mobile: horizontal thumbs + one preview + one control row */}
-        <div className="space-y-3 lg:hidden">
-          {urls.length > 0 && selectedUrl ? (
-            <>
-              <button
-                type="button"
-                className="relative aspect-square w-full overflow-hidden rounded-[var(--radius-md)] bg-[var(--bg-muted)] ring-1 ring-[var(--border-default)]"
-                onClick={() => setPreviewOpen(true)}
-                aria-label="View photo full screen"
-              >
-                <Image
-                  src={selectedUrl}
-                  alt=""
-                  fill
-                  className="object-cover"
-                  sizes="100vw"
-                  unoptimized={selectedUrl.startsWith("http://localhost")}
-                  priority
-                />
-                {selectedIdx === 0 ? (
-                  <span className="pointer-events-none absolute left-2 top-2 rounded-md bg-black/65 px-2 py-0.5 text-[11px] font-medium text-white">
-                    Cover
-                  </span>
-                ) : null}
-              </button>
-              <div className="flex flex-col gap-0.5 text-center">
-                <p className="text-xs font-medium text-[var(--text-muted)]">
-                  {selectedIdx + 1} of {urls.length}
-                </p>
-                <p className="text-[10px] text-[var(--text-muted)]">Tap image to enlarge</p>
-              </div>
-
-              <div
-                ref={stripRef}
-                className="flex snap-x snap-mandatory gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-              >
-                {urls.map((url, i) => (
-                  <button
-                    key={url}
-                    type="button"
-                    data-thumb-index={i}
-                    onClick={() => setSelectedIdx(i)}
-                    className={cn(
-                      "relative size-16 shrink-0 snap-center snap-always overflow-hidden rounded-[var(--radius-md)] ring-2 ring-offset-2 ring-offset-[var(--bg-card)] transition-all",
-                      i === selectedIdx
-                        ? "ring-[var(--brand-primary)]"
-                        : "ring-transparent opacity-80 hover:opacity-100",
-                    )}
-                    aria-label={`Photo ${i + 1}${i === 0 ? ", cover" : ""}`}
-                    aria-current={i === selectedIdx}
-                  >
-                    <Image
-                      src={url}
-                      alt=""
-                      fill
-                      className="object-cover"
-                      sizes="64px"
-                      unoptimized={url.startsWith("http://localhost")}
-                    />
-                  </button>
-                ))}
-              </div>
-
-              <div className="flex items-center justify-between gap-1">
-                <div className="flex flex-1 items-center gap-1">
-                  <Button
-                    type="button"
-                    size="icon"
-                    variant="secondary"
-                    className={cn("size-9 shrink-0 rounded-md", !canMoveLeft && "opacity-40")}
-                    disabled={busy || !canMoveLeft}
-                    aria-label="Move earlier in gallery"
-                    onClick={() => moveSelected(-1)}
-                  >
-                    <ChevronLeft className="size-4" />
-                  </Button>
-                  <Button
-                    type="button"
-                    size="icon"
-                    variant="secondary"
-                    className={cn("size-9 shrink-0 rounded-md", !canMoveRight && "opacity-40")}
-                    disabled={busy || !canMoveRight}
-                    aria-label="Move later in gallery"
-                    onClick={() => moveSelected(1)}
-                  >
-                    <ChevronRight className="size-4" />
-                  </Button>
-                </div>
-                <Button
-                  type="button"
-                  size="icon"
-                  variant="destructive"
-                  className="size-9 shrink-0 rounded-md"
-                  disabled={busy || urls.length <= 1}
-                  aria-label="Remove selected photo"
-                  onClick={() => {
-                    removeAt(selectedIdx);
-                  }}
-                >
-                  <X className="size-4" />
-                </Button>
-              </div>
-              <Button
-                type="button"
-                variant="secondary"
-                size="sm"
-                className="w-full min-h-9 gap-1.5 text-xs"
-                disabled={busy}
-                onClick={() => {
-                  enhanceImage.mutate(selectedUrl, {
-                    onSuccess: (data) => setUrls([...data.imageUrls]),
-                  });
-                }}
-              >
-                {enhanceImage.isPending && enhanceImage.variables === selectedUrl ? (
-                  <Loader2 className="size-3.5 shrink-0 animate-spin" />
-                ) : (
-                  <Sparkles className="size-3.5 shrink-0" />
-                )}
-                Enhance with AI
-              </Button>
-            </>
-          ) : null}
-        </div>
-
-        <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
-          <DialogContent className="max-h-[95vh] max-w-[min(100vw-1rem,36rem)] border-0 bg-transparent p-0 shadow-none [&>button]:text-white [&>button]:ring-offset-transparent">
-            <DialogTitle className="sr-only">Product photo preview</DialogTitle>
-            {selectedUrl ? (
-              <div className="relative aspect-square w-full overflow-hidden rounded-[var(--radius-lg)] bg-black/40">
-                <Image
-                  src={selectedUrl}
-                  alt=""
-                  fill
-                  className="object-contain"
-                  sizes="(max-width:768px) 100vw, 600px"
-                  unoptimized={selectedUrl.startsWith("http://localhost")}
-                />
-              </div>
-            ) : null}
-          </DialogContent>
-        </Dialog>
-
-        {/* Desktop: original grid */}
         <ul
           className={cn(
-            "hidden lg:grid",
+            "grid",
             manyPhotos
               ? "grid-cols-2 gap-3 md:grid-cols-3"
               : "grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2",
