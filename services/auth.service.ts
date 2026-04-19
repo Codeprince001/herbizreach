@@ -13,5 +13,11 @@ export const AuthService = {
     phone: string;
   }) => api.post<AuthResponse>("/auth/register", body).then((r) => r.data),
 
+  forgotPassword: (email: string) =>
+    api.post<{ message: string }>("/auth/forgot-password", { email }).then((r) => r.data),
+
+  resetPassword: (body: { email: string; code: string; newPassword: string }) =>
+    api.post<{ message: string }>("/auth/reset-password", body).then((r) => r.data),
+
   me: () => api.get<AuthUser>("/auth/me").then((r) => r.data),
 };

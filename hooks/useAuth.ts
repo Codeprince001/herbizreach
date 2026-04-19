@@ -31,6 +31,47 @@ export function useLogin() {
   });
 }
 
+export function useForgotPassword() {
+  return useMutation({
+    mutationFn: (email: string) => AuthService.forgotPassword(email),
+    onSuccess: (data) => {
+      toast.success("Check your email", {
+        description: data.message,
+      });
+    },
+    onError: (err: unknown) => {
+      const msg =
+        err && typeof err === "object" && "response" in err
+          ? String(
+              (err as { response?: { data?: { message?: string | string[] } } }).response?.data
+                ?.message ?? "",
+            )
+          : "";
+      toast.error(typeof msg === "string" && msg ? msg : "Could not send reset email.");
+    },
+  });
+}
+
+export function useResetPassword() {
+  const router = useRouter();
+  return useMutation({
+    mutationFn: AuthService.resetPassword,
+    onSuccess: (data) => {
+      toast.success("Password updated", { description: data.message });
+      router.replace("/login");
+    },
+    onError: (err: unknown) => {
+      const raw =
+        err && typeof err === "object" && "response" in err
+          ? (err as { response?: { data?: { message?: string | string[] } } }).response?.data
+              ?.message
+          : undefined;
+      const msg = Array.isArray(raw) ? raw[0] : raw;
+      toast.error(typeof msg === "string" && msg ? msg : "Reset failed. Try again or request a new code.");
+    },
+  });
+}
+
 export function useRegisterOwner() {
   const setAuth = useAuthStore((s) => s.setAuth);
   const router = useRouter();
