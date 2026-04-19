@@ -23,7 +23,12 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401 && typeof window !== "undefined") {
       const path = window.location.pathname;
-      if (path === "/login" || path === "/register") {
+      if (
+        path === "/login" ||
+        path === "/register" ||
+        path === "/forgot-password" ||
+        path === "/reset-password"
+      ) {
         return Promise.reject(error);
       }
       useAuthStore.getState().logout();
