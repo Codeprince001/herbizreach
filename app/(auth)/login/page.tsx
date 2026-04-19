@@ -51,15 +51,7 @@ export default function LoginPage() {
               ) : null}
             </div>
             <div className="space-y-2">
-              <div className="flex items-center justify-between gap-2">
-                <Label htmlFor="password">Password</Label>
-                <Link
-                  href="/forgot-password"
-                  className="text-xs font-medium text-[var(--brand-primary)] hover:underline"
-                >
-                  Forgot password?
-                </Link>
-              </div>
+              <Label htmlFor="password">Password</Label>
               <Input
                 id="password"
                 type="password"
@@ -76,6 +68,11 @@ export default function LoginPage() {
             <Button type="submit" className="min-h-11 w-full" disabled={login.isPending}>
               {login.isPending ? "Signing in…" : "Sign in"}
             </Button>
+            <p className="text-center text-sm">
+              <Link href="/forgot-password" className="font-medium text-[var(--brand-primary)] hover:underline">
+                Forgot your password?
+              </Link>
+            </p>
           </form>
           <p className="mt-4 text-center text-sm text-[var(--text-muted)]">
             New here?{" "}
