@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
 import { OwnerSidebar } from "@/components/layout/OwnerSidebar";
 import { TopBar } from "@/components/layout/TopBar";
+import { FcmOwnerRegistrar } from "@/components/push/FcmOwnerRegistrar";
 import { useOwnerInboxSocket } from "@/hooks/useOwnerInboxSocket";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { cn } from "@/lib/utils";
@@ -57,6 +58,7 @@ function OwnerShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-[var(--bg-base)] pb-20 md:pb-0 md:pl-60">
+      <FcmOwnerRegistrar />
       <OwnerInboxSocketBridge />
       <OwnerSidebar />
       <div className={cn(hideMobileTopBar && "hidden md:block")}>
