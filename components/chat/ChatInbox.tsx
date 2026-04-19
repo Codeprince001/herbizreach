@@ -11,6 +11,7 @@ import {
   X,
 } from "lucide-react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -41,6 +42,7 @@ function avatarLetter(label: string): string {
 
 export function ChatInbox(props: { conversations: Conversation[] | undefined; loading: boolean }) {
   const { conversations, loading } = props;
+  const searchParams = useSearchParams();
   const token = useAuthStore((s) => s.token);
   const businessSlug = useAuthStore((s) => s.user?.businessSlug);
   const clearUnreadFor = useChatStore((s) => s.clearUnreadFor);
@@ -61,6 +63,14 @@ export function ChatInbox(props: { conversations: Conversation[] | undefined; lo
       return tb - ta;
     });
   }, [conversations]);
+
+  const conversationFromUrl = searchParams.get("conversation");
+  useEffect(() => {
+    if (!conversationFromUrl || !conversations?.length) return;
+    if (conversations.some((c) => c.id === conversationFromUrl)) {
+      setSelectedId(conversationFromUrl);
+    }
+  }, [conversationFromUrl, conversations]);
 
   const { data: messagesData } = useConversationMessages(selectedId, null);
   const archive = useArchiveConversation();

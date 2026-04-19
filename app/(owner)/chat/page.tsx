@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { ChatInbox } from "@/components/chat/ChatInbox";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { LoadingSkeleton } from "@/components/shared/LoadingSkeleton";
@@ -23,7 +24,9 @@ export default function ChatPage() {
         title="Messages"
         description="Chat with customers in real time."
       />
-      <ChatInbox conversations={data ?? []} loading={false} />
+      <Suspense fallback={<LoadingSkeleton />}>
+        <ChatInbox conversations={data ?? []} loading={false} />
+      </Suspense>
     </div>
   );
 }
